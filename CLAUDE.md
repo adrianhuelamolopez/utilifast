@@ -1,0 +1,155 @@
+# UtiliFast
+
+Portal de micro-calculadoras en español. **Vite + JavaScript vanilla + Tailwind**, sin framework.
+Objetivo del proyecto: tráfico orgánico monetizado con AdSense.
+
+El `README.md` documenta el *cómo* para cualquiera que llegue al repositorio. Este fichero recoge
+el *por qué*: decisiones tomadas, trampas ya pisadas y lo que queda pendiente.
+
+```bash
+npm run dev      # desarrollo
+npm run build    # vite build + prerender por ruta -> dist/
+npm run preview  # sirve dist/ replicando Cloudflare Pages
+npm run meta     # regenera src/meta.js desde las vistas (tras añadir una herramienta)
+npm run og       # regenera public/og-default.png
+npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueables
+```
+
+## Estado actual
+
+- **14 herramientas** + 3 páginas satélite + `/quienes-somos` + `/legal` = **20 rutas prerenderizadas**.
+- Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
+- Artículos de 333–496 palabras por herramienta. Los satélites bajan a ~270, aceptable porque
+  además llevan el bloque de respuesta y las cifras.
+- Dominio `utilifast.com` comprado, correo `hola@utilifast.com` enrutado. Repositorio ya enlazado
+  para Cloudflare Pages.
+
+## Las cuatro ideas que sostienen el proyecto
+
+**1. Prerender por ruta, no SPA a secas.** Una SPA pura no se indexa de forma fiable. `npm run build`
+reutiliza las mismas vistas desde Node y escribe un HTML completo por URL. El bundle hidrata encima.
+
+**2. Clusters temáticos.** Cada herramienta declara un `cluster`. Gobierna el filtro del directorio y,
+sobre todo, el enlazado interno: «Sigue explorando» prioriza el mismo tema. Concentrar enlaces
+dentro de un tema construye autoridad; repartirlos al azar la diluye.
+
+**3. Páginas satélite.** Responden a *una pregunta concreta* («¿cuánto ahorro amortizando 100 € al
+mes?») con el número ya calculado y escrito en el HTML. Nadie busca «calculadora de hipoteca»: contra
+esa palabra compiten bancos y dominios dedicados. Contra la pregunta larga, no compite nadie.
+La satélite capta la búsqueda y el botón lleva a la calculadora.
+
+**4. Profundidad antes que amplitud.** Un portal masivo tiene 50 herramientas con 200-300 palabras
+cada una y ninguna autoría. La ventaja no está en tener más, está en resolver la pregunta entera.
+
+## Convenciones que hay que respetar
+
+### Añadir una herramienta
+
+1. Crear `src/views/<nombre>.js` con `meta`, `render()` y `mount(root)`.
+2. Añadir su nombre a la lista de `scripts/gen-meta.mjs` y ejecutar `npm run meta`.
+3. Sustituir el `meta` en línea por `import { <nombre> as meta } from '../meta.js'; export { meta };`
+4. Registrar en `src/routes.js` con `import()` dinámico y en `src/catalog.js` con su cluster.
+5. `npm run auditar` antes de dar nada por bueno.
+
+**`src/meta.js` es la fuente de verdad de los metadatos.** Tras el paso 3 las vistas lo importan,
+así que `npm run meta` ya solo sirve para dar de alta una herramienta nueva: para editar un título
+o una descripción, toca `src/meta.js` directamente.
+
+**Límites que respeta la auditoría:** título ≤ 50 caracteres (con « · UtiliFast» queda en 62, justo
+en lo que muestra Google) y descripción entre 120 y 158. Pasarse no rompe nada, pero el final se
+corta en los resultados de búsqueda y se desperdicia.
+
+### Trampas ya pisadas — no repetirlas
+
+**Nombres que bloquea un bloqueador de anuncios.** Un chunk llamado `adSlot-XXXX.js` coincide con los
+filtros de EasyList. Como ese módulo lo importan todas las vistas, el navegador lo descartaba y la web
+se quedaba con la URL cambiada y el contenido anterior: rota para quien usa bloqueador, que en España
+es muchísima gente. Por eso ahora es `components/hueco.js`, `utils/publicidad.js` y clases
+`hueco-marco`/`hueco-banner`. **Nada relacionado con publicidad lleva «ad» en el nombre.**
+(`data-ad-slot` es la excepción: lo exige AdSense.)
+
+**Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
+«unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en
+`src/calc/` (`hipoteca`, `gasolina`, `neumaticos`, `interes`) y las importan **tanto la vista como el
+satélite**. Si escribes un número en un artículo, sácalo de ahí.
+
+**Clases de Tailwind construidas dinámicamente.** `bg-${variable}` no se genera nunca: el escáner solo
+ve literales. Los colores por categoría van como cadenas completas (`'bg-data-1'`).
+
+**Pasos de opacidad.** `bg-accent/12` falla salvo que el 12 esté en `theme.opacity`. Hay una lista
+ampliada en `tailwind.config.js`.
+
+**Padding de tablas.** `.data-table` da el estilo base; el padding lateral de las columnas de los
+extremos es una decisión explícita: `.data-table-flush` dentro de una caja ya acolchada,
+`.data-table-inset` a sangre dentro de una tarjeta. **No lo ajustes con `px-4` en las celdas**: las
+reglas `:first-child` del componente tienen más especificidad y lo anulan justo en los bordes.
+
+**Navegación que falla en silencio.** Si un chunk no llega, el router hace una navegación normal del
+navegador en lugar de dejar al usuario con la URL cambiada. Una marca en `sessionStorage` evita el
+bucle. No quites ese camino de recuperación.
+
+## Decisiones tomadas y su motivo
+
+| Decisión | Motivo |
+| --- | --- |
+| El IMC se queda | YMYL exige rigor, no prohíbe. Ya lleva los avisos correctos. |
+| Sin conversor de unidades ni de porcentajes | Google responde esas consultas en su propia página: el CTR es ruinoso. |
+| Sin generador de docker-compose ni CIDR | Público técnico con tasas de bloqueo altísimas y volumen pequeño en español. |
+| Afiliación aplazada | Amazon exige 3 ventas en 180 días o cierra la cuenta. Sin tráfico, se quema. Y en salud contradiría lo que promete `/quienes-somos`. |
+| Datos personales opcionales en las páginas legales | Decisión del propietario. `SITE.titular` vacío publica textos coherentes; relleno, completa el aviso del art. 10 LSSI. La obligación solo aplica con actividad económica. |
+| Nombre de dominio en `.com` | `utilifast.com` estaba libre (verificado por RDAP); el usuario había buscado `utilfast` sin la «i». |
+
+## Verificaciones hechas a mano
+
+Números contrastados contra cálculo manual, **no cambiar sin recalcular**:
+
+- Hipoteca 180.000 € al 3,1 % a 25 años → cuota **862,97 €**, intereses **78.891,58 €**.
+  Con 100 €/mes extra: **21 años y 4 meses** y **12.743,73 €** de ahorro.
+- Gasolina 600 km, 6 l/100, 1,559 €/l, 30 € peajes, 2 personas → **43,06 €/persona**.
+- IVA: quitar el 21 % a 1.210 € → base **1.000 €** (dividir entre 1,21, nunca restar el 21 %).
+- Calorías mujer 30 a / 68 kg / 168 cm → TMB **1.419**, gasto **2.199** (Mifflin-St Jeor).
+- 1RM 80 kg × 5 reps → media **91,7 kg** de cinco fórmulas.
+- Neumáticos 205/55 R16 → **631,9 mm**; 225/45 R17 → **634,3 mm** (+0,38 %).
+- Interés compuesto 5.000 € + 200 €/mes al 6 % durante 20 años → **108.959,20 €**
+  (coincide al céntimo con la fórmula cerrada).
+- Cable 15 A, 3 m, 12 V, 3 % → 4,375 mm² teóricos → **6 mm²** comerciales.
+  El fusible va un 25 % por encima del consumo y el cable debe aguantar más que el fusible.
+
+## Rigor que hay que mantener
+
+Cada herramienta cita su base de cálculo en `/quienes-somos`. Es la ventaja competitiva real:
+`calculadoras.io` monetiza con 210 socios publicitarios y no publica ni autoría ni fuentes, y
+`calculadoradehipoteca.es` tampoco tiene página de quiénes somos.
+
+Dos correcciones que costó descubrir y conviene no deshacer:
+
+- La tolerancia del ±3 % en neumáticos **sí está en el Manual ITV**, y es uno de **cuatro** criterios
+  (carga, velocidad, diámetro, perfil de llanta). El cuarto no es comprobable con la medida del
+  neumático y la herramienta lo dice en lugar de fingir que lo valida.
+- El equivalente de neumático no se filtra solo por diámetro: sin acotar anchura (±30 mm) y llanta
+  (±2"), proponía montar un 155/40 R20 en lugar de un 205/55 R16.
+
+## Pendiente
+
+**Del propietario:**
+- Rellenar `SITE.titular` si decide monetizar (nombre, NIF, localidad). Hoy vacío a propósito.
+- Subir a GitHub y conectar Cloudflare Pages: build `npm run build`, output `dist`, Node de `.nvmrc`.
+- Dar de alta en Search Console y enviar el sitemap.
+- Cloudflare Web Analytics (gratis, sin cookies, no requiere consentimiento).
+
+**Técnico:**
+- Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres.
+- `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
+- AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido `ads.txt`.
+
+## Expectativas realistas
+
+Las calculadoras tienen RPM bajo (~1-4 € por mil páginas vistas en España): el usuario entra, calcula
+y se va. Para 100 €/mes hacen falta del orden de 30.000-100.000 visitas mensuales. Los primeros meses
+lo normal es entre 0 y 20 €. Es un proyecto de año y medio, no de tres semanas.
+
+## Cómo trabajar aquí
+
+- Verificar en el navegador antes de dar algo por bueno; medir, no suponer.
+- Los avisos sanitarios y legales de las herramientas no son relleno: protegen y cuentan para E-E-A-T.
+- Si una cifra publicada resulta estar mal, corregirla y decirlo. Ya ha pasado dos veces.

@@ -1,0 +1,26 @@
+{
+  "name": "utilifast",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Portal de micro-herramientas online que funcionan 100% en el navegador.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prerender.mjs",
+    "preview": "vite preview",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "og": "node scripts/gen-og.mjs",
+    "meta": "node scripts/gen-meta.mjs",
+    "auditar": "node scripts/auditar.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "qr-creator": "^1.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.7"
+  }
+}

@@ -1,0 +1,486 @@
+/* ------------------------------------------------------------------ *
+ * Tipografía autoalojada (sin CDN). Solo el subconjunto latino: 48 kB.
+ * ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Fallback con métricas ajustadas a Inter: el intercambio de fuente no mueve el texto (CLS ≈ 0). */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  ascent-override: 90.2%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+  size-adjust: 107.4%;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *
+ * Tokens de color (triplete RGB para poder usar opacidad en Tailwind)
+ * ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --canvas: 247 248 252;
+    --surface: 255 255 255;
+    --surface-muted: 244 246 251;
+    --surface-raised: 255 255 255;
+
+    --line: 226 231 240;
+    --line-strong: 203 211 226;
+
+    --content: 12 18 34;
+    --content-muted: 71 85 105;   /* 7,0:1 sobre el lienzo */
+    --content-subtle: 95 110 133; /* 4,9:1 — mínimo AA para texto pequeño */
+    --content-inverse: 255 255 255;
+
+    --accent: 79 70 229;
+    --accent-hover: 67 56 202;
+    --accent-soft: 238 238 255;
+    --accent-fg: 255 255 255;
+    --accent-ring: 129 122 246;
+    --violet-brand: 124 58 237;
+
+    --positive: 5 150 105;
+    --positive-soft: 226 247 240;
+    --caution: 180 83 9;
+    --caution-soft: 254 246 227;
+
+    --data-1: 37 99 235;
+    --data-2: 217 119 6;
+    --data-3: 219 39 119;
+
+    --shadow: 15 23 42;
+
+    color-scheme: light;
+  }
+
+  [data-theme='dark'] {
+    --canvas: 8 11 20;
+    --surface: 16 21 36;
+    --surface-muted: 22 29 49;
+    --surface-raised: 25 32 54;
+
+    --line: 33 43 68;
+    --line-strong: 51 65 98;
+
+    --content: 233 237 246;
+    --content-muted: 155 167 192;
+    --content-subtle: 132 145 174; /* 5,3:1 incluso sobre surface-muted */
+    --content-inverse: 10 14 25;
+
+    --accent: 129 130 255;
+    --accent-hover: 156 156 255;
+    --accent-soft: 30 34 68;
+    --accent-fg: 10 12 26;
+    --accent-ring: 129 130 255;
+    --violet-brand: 167 118 255;
+
+    --positive: 52 211 153;
+    --positive-soft: 12 43 40;
+    --caution: 251 191 36;
+    --caution-soft: 51 38 12;
+
+    --data-1: 96 165 250;
+    --data-2: 251 191 36;
+    --data-3: 244 114 182;
+
+    --shadow: 0 0 0;
+
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: rgb(var(--line));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-content antialiased;
+    scrollbar-gutter: stable;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(var(--accent) / 0.22);
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent-ring ring-offset-2 ring-offset-canvas;
+  }
+
+  h1 {
+    @apply text-title font-bold text-content;
+  }
+  h2 {
+    @apply text-xl font-semibold tracking-tight text-content sm:text-2xl;
+  }
+  h3 {
+    @apply text-base font-semibold text-content;
+  }
+
+  /* Barra de desplazamiento discreta y coherente con el tema */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line-strong)) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--line-strong));
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 99px;
+  }
+
+  /* Indicador de carga de una vista: solo visible si la red se hace notar */
+  .cargando::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 2px;
+    z-index: 70;
+    background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--violet-brand)));
+    transform-origin: left;
+    animation: barra-carga 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes barra-carga {
+    0% { transform: scaleX(0); opacity: 1; }
+    70% { transform: scaleX(0.85); }
+    100% { transform: scaleX(1); opacity: 0; }
+  }
+
+  /* Cambio de tema sin animar cada color por separado */
+  .theme-switching *,
+  .theme-switching *::before,
+  .theme-switching *::after {
+    transition: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Componentes
+ * ------------------------------------------------------------------ */
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
+  }
+
+  /* --- Superficies --- */
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-raised;
+  }
+  .card-flat {
+    @apply rounded-2xl border border-line bg-surface;
+  }
+  .panel {
+    @apply rounded-xl bg-surface-muted ring-1 ring-inset ring-line;
+  }
+  .divider {
+    @apply h-px w-full bg-line;
+  }
+
+  /* Borde con degradado: se usa en la tarjeta destacada del directorio */
+  .ring-gradient {
+    position: relative;
+  }
+  .ring-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgb(var(--accent) / 0.65), rgb(var(--violet-brand) / 0.35), transparent 65%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* --- Formularios --- */
+  .field-label {
+    @apply mb-1.5 flex items-center gap-1.5 text-sm font-medium text-content;
+  }
+
+  .input {
+    @apply block w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[0.9375rem] text-content
+      shadow-subtle outline-none transition placeholder:text-content-subtle
+      hover:border-line-strong focus:border-accent focus:ring-4 focus:ring-accent/12;
+  }
+  select.input {
+    @apply cursor-pointer appearance-none bg-[length:1.1rem] bg-[right_0.75rem_center] bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238491ab' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+  .input-invalid {
+    @apply border-data-3 focus:border-data-3 focus:ring-data-3/15;
+  }
+  .hint {
+    @apply mt-1.5 text-xs leading-5 text-content-subtle;
+  }
+
+  /* Grupo de campo con prefijo/sufijo (€, km, l/100…) */
+  .input-affix {
+    @apply pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-xs font-medium text-content-subtle;
+  }
+
+  /* --- Botones --- */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm
+      font-semibold leading-5 transition duration-200 ease-spring disabled:cursor-not-allowed disabled:opacity-45;
+  }
+  .btn-primary {
+    /* El borde transparente iguala la caja con .btn-secondary: si no, los pares de
+       botones quedan desalineados 2 px (y «rechazar» debe ser idéntico a «aceptar»). */
+    @apply btn border border-transparent bg-accent-gradient text-accent-fg shadow-glow
+      hover:brightness-110 active:scale-[0.985];
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-surface text-content shadow-subtle hover:border-line-strong hover:bg-surface-muted active:scale-[0.985];
+  }
+  .btn-ghost {
+    @apply btn text-content-muted hover:bg-surface-muted hover:text-content;
+  }
+  .btn-icon {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-surface
+      text-content-muted transition hover:border-line-strong hover:text-content;
+  }
+  .btn-sm {
+    @apply px-3 py-2 text-xs;
+  }
+  .btn-success {
+    @apply !bg-positive !bg-none !text-white !shadow-none;
+  }
+
+  /* --- Chips / segmentado --- */
+  .chip {
+    @apply inline-flex cursor-pointer select-none items-center gap-1.5 rounded-full border border-line
+      bg-surface px-3.5 py-1.5 text-sm font-medium text-content-muted transition
+      hover:border-line-strong hover:text-content;
+  }
+  .chip-active {
+    @apply border-accent/40 bg-accent-soft text-accent;
+  }
+
+  .segmented {
+    @apply inline-flex w-full gap-1 rounded-xl bg-surface-muted p-1 ring-1 ring-inset ring-line;
+  }
+  .segmented-item {
+    @apply flex-1 cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-medium text-content-muted transition
+      hover:text-content;
+  }
+  .segmented-item[aria-pressed='true'] {
+    @apply bg-surface text-content shadow-subtle;
+  }
+
+  /* --- Datos --- */
+  .stat {
+    @apply rounded-xl bg-surface-muted p-3.5 ring-1 ring-inset ring-line;
+  }
+  .stat-label {
+    @apply text-2xs font-semibold uppercase tracking-wider text-content-subtle;
+  }
+  .stat-value {
+    @apply mt-1 text-xl font-bold tabular-nums tracking-tight text-content;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider;
+  }
+  .badge-accent {
+    @apply badge bg-accent-soft text-accent;
+  }
+  .badge-positive {
+    @apply badge bg-positive-soft text-positive;
+  }
+
+  .data-table {
+    @apply w-full border-collapse text-sm;
+  }
+  .data-table thead th {
+    @apply border-b border-line py-2.5 text-2xs font-semibold uppercase tracking-wider text-content-subtle;
+  }
+  .data-table tbody tr {
+    @apply border-b border-line/70 transition-colors last:border-0 hover:bg-surface-muted/70;
+  }
+  .data-table td,
+  .data-table th {
+    @apply px-3;
+  }
+  /* Tabla dentro de una caja que YA tiene padding: las columnas de los extremos
+     se alinean con el resto del contenido. */
+  .data-table-flush td:first-child,
+  .data-table-flush th:first-child {
+    @apply pl-0;
+  }
+  .data-table-flush td:last-child,
+  .data-table-flush th:last-child {
+    @apply pr-0;
+  }
+  /* Tabla a sangre dentro de una tarjeta sin padding: los extremos aportan
+     el margen lateral que la tarjeta no da. */
+  .data-table-inset td:first-child,
+  .data-table-inset th:first-child {
+    @apply pl-5 sm:pl-6;
+  }
+  .data-table-inset td:last-child,
+  .data-table-inset th:last-child {
+    @apply pr-5 sm:pr-6;
+  }
+
+  /* --- Contenido editorial --- */
+  .prose-seo {
+    @apply max-w-prose text-[0.9688rem] leading-[1.75] text-content-muted;
+  }
+  .prose-seo h2 {
+    @apply mb-3 mt-10 text-xl font-semibold tracking-tight text-content;
+  }
+  .prose-seo h3 {
+    @apply mb-2 mt-7 text-base font-semibold text-content;
+  }
+  .prose-seo p {
+    @apply mb-4;
+  }
+  .prose-seo ul {
+    @apply mb-4 space-y-2 pl-0;
+  }
+  .prose-seo ul li {
+    @apply relative pl-5;
+  }
+  .prose-seo ul li::before {
+    content: '';
+    @apply absolute left-0 top-[0.6875rem] h-1.5 w-1.5 rounded-full bg-accent/60;
+  }
+  .prose-seo ol {
+    @apply mb-4 list-decimal space-y-2 pl-5 marker:font-semibold marker:text-content-subtle;
+  }
+  .prose-seo strong {
+    @apply font-semibold text-content;
+  }
+  .prose-seo code {
+    @apply rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-[0.85em] text-content ring-1 ring-inset ring-line;
+  }
+  .prose-seo a {
+    @apply font-medium text-accent underline decoration-accent/30 underline-offset-2 transition hover:decoration-accent;
+  }
+
+  .link {
+    @apply text-content-muted transition-colors hover:text-content;
+  }
+
+  /* --- Consentimiento de cookies --- */
+  .switch {
+    @apply relative h-6 w-11 cursor-pointer rounded-full bg-line-strong transition-colors duration-200;
+  }
+  .switch[aria-checked='true'] {
+    @apply bg-accent;
+  }
+  .switch:disabled {
+    @apply cursor-not-allowed opacity-55;
+  }
+  .switch-thumb {
+    @apply absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-raised transition-transform duration-200 ease-spring;
+  }
+  .switch[aria-checked='true'] .switch-thumb {
+    @apply translate-x-5;
+  }
+
+  .cookie-dialog {
+    @apply w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-surface p-0
+      text-content shadow-pop;
+  }
+  .cookie-dialog[open] {
+    @apply animate-scale-in;
+  }
+  .cookie-dialog::backdrop {
+    background: rgb(2 6 23 / 0.6);
+    backdrop-filter: blur(3px);
+  }
+
+  /* --- Publicidad: alto SIEMPRE reservado para mantener CLS = 0 --- */
+  .hueco-marco {
+    @apply mx-auto flex w-full items-center justify-center overflow-hidden rounded-xl
+      bg-surface-muted text-2xs font-semibold uppercase tracking-[0.2em] text-content-subtle;
+    outline: 1px dashed rgb(var(--line-strong));
+    outline-offset: -1px;
+  }
+  .hueco-banner {
+    max-width: 300px;
+    height: 250px;
+  }
+  @media (min-width: 768px) {
+    .hueco-banner {
+      max-width: 728px;
+      height: 90px;
+    }
+  }
+  .hueco-cuadro {
+    max-width: 300px;
+    height: 250px;
+  }
+  .hueco-columna {
+    max-width: 300px;
+    height: 250px;
+  }
+  @media (min-width: 1024px) {
+    .hueco-columna {
+      height: 600px;
+    }
+  }
+}
+
+@layer utilities {
+  .no-spin::-webkit-outer-spin-button,
+  .no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-spin {
+    -moz-appearance: textfield;
+  }
+
+  /* Rejilla decorativa de fondo, desvanecida hacia abajo */
+  .bg-grid-fade {
+    @apply bg-grid bg-grid-cell;
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  }
+
+  .text-gradient {
+    @apply bg-accent-gradient bg-clip-text text-transparent;
+  }
+
+  /* Barras de rango con el color de acento */
+  .range {
+    @apply h-1.5 w-full cursor-pointer appearance-none rounded-full bg-surface-muted;
+    accent-color: rgb(var(--accent));
+  }
+}

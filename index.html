@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Tema aplicado antes de pintar: evita el destello blanco en modo oscuro -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('utilifast:theme');
+          if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = t;
+          if (t === 'dark')
+            document.querySelector('meta[name="theme-color"]').content = '#080b14';
+        } catch (e) {}
+      })();
+    </script>
+
+    <!--seo:start-->
+    <title>UtiliFast · Micro-herramientas online rápidas y sin registro</title>
+    <meta name="description" content="Calculadoras y generadores que funcionan al instante en tu navegador: gastos de gasolina, enlaces y QR de WhatsApp y reparto de macronutrientes. Sin registro y sin enviar datos." />
+    <link rel="canonical" href="https://utilifast.pages.dev/" />
+    <!--seo:end-->
+
+    <script type="module" crossorigin src="/src/main.js"></script>
+  </head>
+  <body>
+    <a
+      href="#contenido"
+      class="btn-primary sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60]"
+      >Saltar al contenido</a
+    >
+    <div id="app"><!--app:html--></div>
+    <noscript>
+      <p style="padding: 1rem; text-align: center">
+        UtiliFast necesita JavaScript para que las calculadoras funcionen. El contenido informativo
+        de cada página sigue siendo legible sin él.
+      </p>
+    </noscript>
+  </body>
+</html>
