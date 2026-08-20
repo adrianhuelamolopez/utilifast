@@ -19,8 +19,8 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 
 - **14 herramientas** + 3 páginas satélite + `/quienes-somos` + `/legal` = **20 rutas prerenderizadas**.
 - Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
-- Artículos de 333–496 palabras por herramienta. Los satélites bajan a ~270, aceptable porque
-  además llevan el bloque de respuesta y las cifras.
+- Artículos de 333–496 palabras por herramienta. Los satélites van de **318 a 432** (medido, no
+  estimado: la nota anterior decía ~270 y era falsa), más el bloque de respuesta con las cifras.
 - **PUBLICADO** en `https://utilifast.com` (Cloudflare Pages, despliegue automático desde `main`).
   Correo `hola@utilifast.com` enrutado con Cloudflare Email Routing.
 - Search Console verificado por **propiedad de Dominio**; sitemap enviado y en estado «Correcto»
@@ -37,10 +37,30 @@ reutiliza las mismas vistas desde Node y escribe un HTML completo por URL. El bu
 sobre todo, el enlazado interno: «Sigue explorando» prioriza el mismo tema. Concentrar enlaces
 dentro de un tema construye autoridad; repartirlos al azar la diluye.
 
-**3. Páginas satélite.** Responden a *una pregunta concreta* («¿cuánto ahorro amortizando 100 € al
+**3. Páginas satélite y su enlazado.** Responden a *una pregunta concreta* («¿cuánto ahorro amortizando 100 € al
 mes?») con el número ya calculado y escrito en el HTML. Nadie busca «calculadora de hipoteca»: contra
 esa palabra compiten bancos y dominios dedicados. Contra la pregunta larga, no compite nadie.
 La satélite capta la búsqueda y el botón lleva a la calculadora.
+
+Una satélite nueva **solo tiene enlaces internos**: el dominio es joven y nadie la enlaza desde fuera,
+así que el enlazado no es un adorno, es lo único que la saca de la cola de rastreo. Cada una recibe
+cuatro enlaces, y ninguno es casual:
+
+| Origen | Dónde se genera |
+| --- | --- |
+| Su herramienta madre, en tarjetas | `preguntas()` en `layout.js` |
+| Su herramienta madre, **dentro del artículo** | prosa de la vista — es el de más peso |
+| Portada | `home.js` |
+| Las páginas del mismo cluster sin satélite propia | `preguntasAfines()` en `layout.js` |
+
+**Por tema y nunca en todas las páginas.** Un bloque idéntico repetido en las veinte páginas es
+plantilla y los buscadores lo descuentan; uno que solo aparece entre páginas afines cuenta como
+señal. Por eso `satelitesAfines()` devuelve `[]` si la página ya tiene satélites propias: dos
+bloques de preguntas seguidos serían ruido y enlace duplicado.
+
+`temaDe()` resuelve el cluster tanto de una herramienta como de una satélite. `relatedTools()`
+lo usa: antes las satélites no estaban en `TOOLS`, se quedaban sin cluster y «Sigue explorando»
+les mostraba cuatro herramientas cualesquiera en vez de las de su tema.
 
 **4. Profundidad antes que amplitud.** Un portal masivo tiene 50 herramientas con 200-300 palabras
 cada una y ninguna autoría. La ventaja no está en tener más, está en resolver la pregunta entera.
@@ -165,7 +185,14 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   corto al rechazo por «contenido de escaso valor».
 
 **Técnico:**
-- Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres.
+- Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres. **De dos en dos por
+  semana, no en tandas**: no existe límite de páginas en Google —el *crawl budget* empieza a importar
+  a partir de miles de URLs y aquí hay 20—, pero un dominio recién nacido que pasa de 20 a 50 páginas
+  con la misma plantilla en una semana tiene el perfil del contenido generado en masa.
+  A partir de la semana 3 (≈10 de septiembre de 2026) hay que escribirlas **contra las impresiones
+  reales de Search Console**, no adivinando: qué consultas ya rozan el sitio vale más que cualquier
+  lista hecha a priori. Candidatas mientras tanto: «amortizar 200 al mes», «calorías para perder
+  5 kilos», «Madrid-Barcelona en coche», «sección de cable para faros LED».
 - `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
 - AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido
   `ads.txt` y los huecos, que hoy no se emiten.

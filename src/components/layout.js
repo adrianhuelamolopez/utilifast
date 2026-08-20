@@ -1,5 +1,5 @@
 import { NAV, TOOLS, CLUSTERS } from '../catalog.js';
-import { satelitesDe } from '../satelites.js';
+import { SATELITES, satelitesDe } from '../satelites.js';
 import { SITE } from '../config.js';
 import { escapeHtml } from '../utils/format.js';
 import { icon, logoMark, wordmark } from './icons.js';
@@ -161,6 +161,36 @@ function header(activePath) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Enlazado interno de las páginas satélite
+ * ------------------------------------------------------------------ *
+ * Una satélite recién publicada solo tiene enlaces internos: el dominio es nuevo
+ * y nadie la enlaza desde fuera. Con dos enlaces entrantes se queda al final de
+ * la cola de rastreo, así que cada una recibe además los de las páginas de su
+ * mismo tema.
+ *
+ * Por tema y no en un bloque repetido en las veinte páginas: un enlace idéntico
+ * en todo el sitio es plantilla y se descuenta; uno que solo aparece entre
+ * páginas afines cuenta como señal de que ese tema va junto.
+ */
+
+/** Cluster temático de una ruta, sea herramienta o satélite. */
+function temaDe(path) {
+  const satelite = SATELITES.find((s) => s.path === path);
+  const herramienta = satelite ? satelite.herramienta : path;
+  return TOOLS.find((t) => t.path === herramienta)?.cluster;
+}
+
+/** Satélites del mismo tema que no cuelgan ya de esta página. */
+function satelitesAfines(activePath) {
+  // Si la página tiene satélites propias ya las lista `preguntas()` justo arriba:
+  // dos bloques de preguntas seguidos serían ruido.
+  if (satelitesDe(activePath).length) return [];
+  const tema = temaDe(activePath);
+  if (!tema) return [];
+  return SATELITES.filter((s) => s.path !== activePath && temaDe(s.path) === tema);
+}
+
+/* ------------------------------------------------------------------ *
  * Preguntas concretas que responde esta herramienta
  * ------------------------------------------------------------------ */
 function preguntas(activePath) {
@@ -191,14 +221,56 @@ function preguntas(activePath) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Preguntas resueltas en el mismo tema
+ * ------------------------------------------------------------------ *
+ * Más discreta que `preguntas()` a propósito: es contenido de otra herramienta,
+ * no de esta, y no debe competir con el bloque principal.
+ */
+function preguntasAfines(activePath) {
+  const lista = satelitesAfines(activePath);
+  if (!lista.length) return '';
+  return `
+  <div class="container-x">
+  <section class="mt-16 border-t border-line pt-10" aria-labelledby="preguntas-afines">
+    <h2 id="preguntas-afines" class="mb-1.5 text-lg">Otras preguntas resueltas del mismo tema</h2>
+    <p class="mb-5 text-sm text-content-muted">Con el número ya calculado, por si te pilla de camino.</p>
+    <ul class="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+      ${lista
+        .map(
+          (s) => `
+        <li>
+          <a href="${s.path}" data-link
+             class="group flex items-center gap-3 p-4 transition-colors hover:bg-surface-muted">
+            <span class="shrink-0 text-accent">${icon('spark', { class: 'h-4 w-4' })}</span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-content">${escapeHtml(s.h1)}</span>
+              <span class="mt-0.5 block text-2xs font-semibold uppercase tracking-wider text-content-subtle">
+                ${escapeHtml((TOOLS.find((t) => t.path === s.herramienta) || {}).navLabel || '')}
+              </span>
+            </span>
+            <span class="shrink-0 text-content-subtle transition-transform duration-300 ease-spring group-hover:translate-x-0.5">
+              ${icon('arrowRight', { class: 'h-4 w-4' })}
+            </span>
+          </a>
+        </li>`
+        )
+        .join('')}
+    </ul>
+  </section>
+  </div>`;
+}
+
+/* ------------------------------------------------------------------ *
  * Herramientas relacionadas
  * ------------------------------------------------------------------ */
 function relatedTools(activePath) {
-  const actual = TOOLS.find((t) => t.path === activePath);
   const resto = TOOLS.filter((t) => t.path !== activePath);
   // Primero las del mismo cluster temático: refuerza la autoridad del sitio
   // sobre ese tema y da al usuario el enlace que realmente le interesa.
-  const mismoTema = resto.filter((t) => actual && t.cluster === actual.cluster);
+  // `temaDe` resuelve también las satélites, que antes caían aquí sin cluster y
+  // acababan mostrando cuatro herramientas cualesquiera.
+  const tema = temaDe(activePath);
+  const mismoTema = resto.filter((t) => tema && t.cluster === tema);
   const otras = resto.filter((t) => !mismoTema.includes(t));
   const others = [...mismoTema, ...otras].slice(0, 4);
   if (!others.length || activePath === '/') return '';
@@ -324,6 +396,7 @@ export function shell(meta, viewHtml) {
   <main id="contenido" data-route="${meta.path}" class="pb-4">
     ${viewHtml}
     ${preguntas(meta.path)}
+    ${preguntasAfines(meta.path)}
     ${relatedTools(meta.path)}
   </main>
   ${footer()}`;

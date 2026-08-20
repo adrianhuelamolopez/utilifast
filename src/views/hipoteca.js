@@ -195,9 +195,10 @@ export function render() {
         préstamo, que son los que más capital pendiente arrastran. Esta calculadora simula esa modalidad.
       </p>
       <p>
-        El efecto sorprende: sobre el ejemplo anterior, 100 € más al mes recortan tres años y ocho meses y ahorran
-        unos 12.700 € en intereses. Cuanto antes se hace la aportación, mayor es el efecto, porque el interés
-        se aplica sobre un capital pendiente que se reduce durante más tiempo.
+        El efecto sorprende: sobre el ejemplo anterior,
+        <a href="/hipoteca/amortizar-100-euros-al-mes" data-link>aportar 100 € más al mes recorta tres años y
+        ocho meses</a> y ahorra unos 12.700 € en intereses. Cuanto antes se hace la aportación, mayor es el
+        efecto, porque el interés se aplica sobre un capital pendiente que se reduce durante más tiempo.
       </p>
       <h2>Qué no incluye este cálculo</h2>
       <p>

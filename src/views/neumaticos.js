@@ -204,6 +204,11 @@ export function render() {
         calibran contando vueltas de rueda.
       </p>
       <p>
+        Un caso habitual ilustra bien los cuatro criterios a la vez:
+        <a href="/neumaticos/225-45-r17-en-lugar-de-205-55-r16" data-link>montar 225/45 R17 llevando de origen
+        205/55 R16</a>, una sustitución muy frecuente al cambiar de llantas.
+      </p>
+      <p>
         El documento que manda en la inspección es la <strong>tarjeta ITV</strong> de tu vehículo, no lo que
         monte un coche parecido ni lo que se lea en un foro. Esta herramienta comprueba el criterio del
         diámetro, que es el que descarta más opciones de golpe; los índices de carga y velocidad los llevas

@@ -225,7 +225,8 @@ export function render() {
         compacto ronda los 8 l/100 km en ciudad, entre 5 y 6 l/100 km en autovía a velocidad constante, y sube
         con facilidad por encima de 7 l/100 km si viajas cargado, con baca, con el aire acondicionado al máximo
         o en puerto de montaña. Los vehículos diésel y los híbridos suelen situarse uno o dos litros por debajo
-        en recorridos largos.
+        en recorridos largos. Para ver el efecto de esos números sobre una ruta concreta, tienes el desglose de
+        <a href="/gasolina/madrid-valencia" data-link>cuánto cuesta ir de Madrid a Valencia en coche</a>.
       </p>
       <h2>Cómo dividir los gastos del coche compartido sin discusiones</h2>
       <p>
