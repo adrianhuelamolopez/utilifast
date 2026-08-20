@@ -58,7 +58,13 @@ console.log('\nPrerender de rutas:');
 
 for (const route of ROUTES) {
   const { path } = route.meta;
-  write(path === '/' ? 'index.html' : `${path.replace(/^\//, '')}/index.html`, await buildPage(route));
+  // Fichero plano, no carpeta con index.html.
+  //
+  // Cloudflare Pages sirve `hipoteca/index.html` en `/hipoteca/` y redirige con un
+  // 308 desde `/hipoteca`, que es justo la URL de nuestros canonical y del sitemap.
+  // Con `hipoteca.html` la sirve directamente en `/hipoteca`: sin redirección y sin
+  // discrepancia entre lo que declaramos y lo que responde el servidor.
+  write(path === '/' ? 'index.html' : `${path.replace(/^\//, '')}.html`, await buildPage(route));
 }
 
 // 404 propio (Cloudflare Pages y Vercel lo sirven automáticamente)

@@ -27,8 +27,13 @@ function paginas(dir = DIST, acc = []) {
   return acc;
 }
 
-const rutaDe = (f) =>
-  '/' + f.split(/[\\/]/).slice(1).join('/').replace(/index\.html$/, '').replace(/\.html$/, '');
+// dist/index.html -> "/" · dist/hipoteca.html -> "/hipoteca"
+// dist/hipoteca/amortizar.html -> "/hipoteca/amortizar"
+const rutaDe = (f) => {
+  const rel = f.split(/[\\/]/).slice(1).join('/');
+  if (rel === 'index.html') return '/';
+  return '/' + rel.replace(/\.html$/, '');
+};
 
 const html = new Map();
 for (const f of paginas()) html.set(rutaDe(f), readFileSync(f, 'utf8'));

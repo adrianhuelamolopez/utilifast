@@ -18,8 +18,8 @@ function previewPrerendered() {
         const [pathname, query = ''] = req.url.split('?');
         if (pathname === '/' || extname(pathname)) return next();
         const clean = pathname.replace(/\/$/, '');
-        if (existsSync(join(distDir, clean, 'index.html'))) {
-          req.url = `${clean}/index.html${query ? '?' + query : ''}`;
+        if (existsSync(join(distDir, `${clean}.html`))) {
+          req.url = `${clean}.html${query ? '?' + query : ''}`;
         } else if (existsSync(join(distDir, '404.html'))) {
           req.url = `/404.html${query ? '?' + query : ''}`;
         }
