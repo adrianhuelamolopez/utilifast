@@ -279,6 +279,7 @@ function footer() {
         <nav aria-label="Información">
           <h2 class="text-2xs font-semibold uppercase tracking-wider text-content-subtle">Información</h2>
           <ul class="mt-3.5 space-y-2.5 text-sm">
+            <li><a class="link" href="/quienes-somos" data-link>Quiénes somos</a></li>
             <li><a class="link" href="/legal" data-link>Aviso legal</a></li>
             <li><a class="link" href="/legal#privacidad" data-link>Política de privacidad</a></li>
             <li><a class="link" href="/legal#cookies">Política de cookies</a></li>

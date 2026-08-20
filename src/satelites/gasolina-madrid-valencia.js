@@ -61,5 +61,19 @@ export default {
       Tampoco incluye el <strong>coste real de usar el coche</strong>: neumáticos, aceite, mantenimiento,
       seguro y depreciación. Si quieres una cifra completa para repartir con honestidad entre los ocupantes,
       una regla habitual es sumar entre 0,03 y 0,06 € por kilómetro a lo que salga de combustible.
+    </p>
+    <h2>Cuándo sale mejor el coche y cuándo el tren</h2>
+    <p>
+      Con estas cifras la comparación se hace sola. Yendo solo, el combustible ya se acerca al precio de un
+      billete de tren comprado con antelación, y encima pones tres horas y media de conducción frente a menos
+      de dos de trayecto. A partir de dos ocupantes el coche empieza a ganar, y con tres o cuatro no hay
+      discusión: el coste por persona baja a menos de la mitad de cualquier alternativa.
+    </p>
+    <p>
+      Hay un matiz que suele olvidarse: el coche te deja en el destino exacto, mientras que el tren te deja en
+      la estación. Si vas a moverte por Valencia capital, el transporte público resuelve; si tu destino es la
+      playa, un pueblo del interior o vas cargado con equipaje, la comodidad del coche vale más que la
+      diferencia de precio. Y si viajas en temporada alta, sumar el aparcamiento en destino puede cambiar por
+      completo el resultado de la comparación.
     </p>`,
 };
