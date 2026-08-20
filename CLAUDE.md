@@ -21,8 +21,12 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 - Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
 - Artículos de 333–496 palabras por herramienta. Los satélites bajan a ~270, aceptable porque
   además llevan el bloque de respuesta y las cifras.
-- Dominio `utilifast.com` comprado, correo `hola@utilifast.com` enrutado. Repositorio ya enlazado
-  para Cloudflare Pages.
+- **PUBLICADO** en `https://utilifast.com` (Cloudflare Pages, despliegue automático desde `main`).
+  Correo `hola@utilifast.com` enrutado con Cloudflare Email Routing.
+- Search Console verificado por **propiedad de Dominio**; sitemap enviado y en estado «Correcto»
+  con las 20 páginas descubiertas (20 de agosto de 2026). La indexación tarda de 1 a 3 semanas.
+- `www.utilifast.com` redirige con 301 a la versión sin www mediante una **Redirect Rule** de
+  Cloudflare (el `_redirects` de Pages no sirve: solo admite rutas relativas, no cambios de dominio).
 
 ## Las cuatro ideas que sostienen el proyecto
 
@@ -88,6 +92,16 @@ reglas `:first-child` del componente tienen más especificidad y lo anulan justo
 navegador en lugar de dejar al usuario con la URL cambiada. Una marca en `sessionStorage` evita el
 bucle. No quites ese camino de recuperación.
 
+**El 308 de Cloudflare por la barra final.** Pages sirve `hipoteca/index.html` en `/hipoteca/` y
+redirige con un 308 desde `/hipoteca`, que es justo la URL de los canonical y del sitemap: Google
+habría reportado «página con redirección» en las 20 URLs. Por eso el prerender escribe **ficheros
+planos** (`hipoteca.html`), que Pages sirve directamente en `/hipoteca`. **No vuelvas al esquema de
+carpeta con `index.html`.** El plugin de `vite preview` y el auditor asumen el esquema plano.
+
+**El sitemap no está en el repositorio y es correcto que no esté.** Se genera en cada build dentro de
+`dist/`, que está en `.gitignore`. Committearlo lo dejaría desactualizado en cuanto cambiara una ruta.
+Existe solo en el sitio publicado, generado por Cloudflare en cada despliegue.
+
 ## Decisiones tomadas y su motivo
 
 | Decisión | Motivo |
@@ -133,14 +147,26 @@ Dos correcciones que costó descubrir y conviene no deshacer:
 
 **Del propietario:**
 - Rellenar `SITE.titular` si decide monetizar (nombre, NIF, localidad). Hoy vacío a propósito.
-- Subir a GitHub y conectar Cloudflare Pages: build `npm run build`, output `dist`, Node de `.nvmrc`.
-- Dar de alta en Search Console y enviar el sitemap.
-- Cloudflare Web Analytics (gratis, sin cookies, no requiere consentimiento).
+- Activar Cloudflare Web Analytics (gratis, sin cookies, no requiere consentimiento).
+- Dar de alta en Bing Webmaster Tools importando desde Search Console.
+- Solicitar AdSense **a las 2-4 semanas**, con contenido ya indexado. Pedirlo antes es el camino
+  corto al rechazo por «contenido de escaso valor».
 
 **Técnico:**
 - Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres.
 - `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
 - AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido `ads.txt`.
+
+## Comprobado en producción (20 de agosto de 2026)
+
+- Las 20 URLs responden **200 sin redirección** y cada canonical apunta a sí misma.
+- `http://` → 301 a https. `www` → 301 a sin www, conservando ruta y parámetros.
+- Ruta inexistente → **404 real** con `noindex, follow`. Ninguna otra página lleva `noindex`.
+- `robots.txt`, `sitemap.xml`, `og-default.png` y `favicon.svg` accesibles. `ads.txt` da 404 a
+  propósito: solo se genera con `SITE.adsense` relleno.
+- HTML con **Brotli**; assets con hash en caché inmutable de un año; `nosniff` y `referrer-policy`.
+- El HTML servido trae el contenido **sin ejecutar JavaScript**: en `/hipoteca`, 1 `h1`, 11 `h2`,
+  JSON-LD y 2.588 palabras.
 
 ## Expectativas realistas
 
