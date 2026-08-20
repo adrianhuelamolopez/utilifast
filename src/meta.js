@@ -11,7 +11,7 @@
  */
 
 export const cable = {
-  "path": "/cable",
+  "path": "/seccion-cable",
   "navLabel": "Sección de cable",
   "isTool": true,
   "cluster": "motor",
@@ -71,7 +71,7 @@ export const contrasena = {
 };
 
 export const cuenta = {
-  "path": "/cuenta",
+  "path": "/dividir-cuenta",
   "navLabel": "Dividir la cuenta",
   "isTool": true,
   "cluster": "utilidades",
@@ -91,7 +91,7 @@ export const cuenta = {
 };
 
 export const fechas = {
-  "path": "/fechas",
+  "path": "/dias-entre-fechas",
   "navLabel": "Días entre fechas",
   "isTool": true,
   "cluster": "utilidades",
