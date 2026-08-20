@@ -139,8 +139,10 @@ export function render() {
     </div>
   </section>
 
-  <div class="container-x">
-    ${hueco({ format: 'leaderboard', className: 'my-10' })}
+  <!-- El aire sobre el directorio va aquí y no en el margen del hueco: cuando no
+       hay publicidad el hueco no se emite y la sección quedaría pegada a la banda. -->
+  <div class="container-x pt-12">
+    ${hueco({ format: 'leaderboard', className: 'mb-10' })}
 
     <!-- Directorio -->
     <section aria-labelledby="directorio" class="scroll-mt-24" id="herramientas">

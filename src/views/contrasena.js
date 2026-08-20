@@ -1,4 +1,4 @@
-import { hueco } from '../components/hueco.js';
+import { hayHueco, hueco } from '../components/hueco.js';
 import { pageHeader, breadcrumbs, privacyNote, seoArticle, faq, panelTitle } from '../components/ui.js';
 import { icon } from '../components/icons.js';
 import { SITE } from '../config.js';
@@ -110,16 +110,19 @@ export function render() {
       </div>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-12">
-      <div class="lg:col-span-7">
-        ${privacyNote(
-          'La contraseña se genera con <code class="rounded bg-positive/10 px-1 font-mono text-xs">crypto.getRandomValues</code>, el generador criptográfico del navegador. Nunca se transmite ni se registra.'
-        )}
-      </div>
-      <div class="lg:col-span-5">
-        ${hueco({ format: 'rectangle' })}
-      </div>
-    </div>
+    ${(() => {
+      const nota = privacyNote(
+        'La contraseña se genera con <code class="rounded bg-positive/10 px-1 font-mono text-xs">crypto.getRandomValues</code>, el generador criptográfico del navegador. Nunca se transmite ni se registra.'
+      );
+      // Sin hueco a la derecha la nota ocupa el ancho completo: repartir la
+      // rejilla dejaría cinco columnas en blanco al lado.
+      return hayHueco('rectangle')
+        ? `<div class="mt-6 grid gap-6 lg:grid-cols-12">
+      <div class="lg:col-span-7">${nota}</div>
+      <div class="lg:col-span-5">${hueco({ format: 'rectangle' })}</div>
+    </div>`
+        : nota; // privacyNote ya trae su propio margen superior
+    })()}
 
     ${hueco({ format: 'leaderboard', className: 'my-12' })}
 

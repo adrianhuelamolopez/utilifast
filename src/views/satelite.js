@@ -1,6 +1,6 @@
 import { SATELITES } from '../satelites.js';
 import { TOOLS } from '../catalog.js';
-import { hueco } from '../components/hueco.js';
+import { hayHueco, hueco } from '../components/hueco.js';
 import { breadcrumbs, seoArticle, privacyNote } from '../components/ui.js';
 import { icon } from '../components/icons.js';
 import { escapeHtml } from '../utils/format.js';
@@ -26,7 +26,7 @@ function render(indice, contenido) {
     ])}
 
     <div class="grid gap-8 lg:grid-cols-12">
-      <div class="lg:col-span-8">
+      <div class="${hayHueco('halfpage') ? 'lg:col-span-8' : 'lg:col-span-8 lg:col-start-3'}">
         <header class="mb-8">
           <p class="badge-accent mb-3">
             ${icon(herramienta.icon, { class: 'h-3.5 w-3.5' })} ${escapeHtml(herramienta.navLabel)}
@@ -79,9 +79,15 @@ function render(indice, contenido) {
         ${privacyNote()}
       </div>
 
-      <aside class="lg:col-span-4">
+      ${
+        // Sin columna de anuncios el artículo se centra en lugar de quedarse
+        // pegado a la izquierda con un tercio de la rejilla en blanco.
+        hayHueco('halfpage')
+          ? `<aside class="lg:col-span-4">
         <div class="sticky top-24">${hueco({ format: 'halfpage' })}</div>
-      </aside>
+      </aside>`
+          : ''
+      }
     </div>
 
     ${hueco({ format: 'leaderboard', className: 'my-12' })}

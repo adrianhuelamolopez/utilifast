@@ -11,6 +11,8 @@
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { SITE } from '../src/config.js';
+
 const DIST = 'dist';
 const problemas = [];
 const avisos = [];
@@ -133,8 +135,16 @@ const bloqueables = readdirSync(join(DIST, 'assets')).filter((n) =>
 );
 if (bloqueables.length) fallo(`ficheros que bloquearía un bloqueador: ${bloqueables.join(', ')}`);
 
-const conHueco = [...html].filter(([, h]) => h.includes('hueco-marco')).length;
-if (conHueco < indexables.length - 3) aviso(`solo ${conHueco} páginas tienen hueco publicitario`);
+// Con AdSense configurado se comprueba que los bloques llegan a casi todas las
+// páginas; sin configurar, lo que se comprueba es lo contrario: que NO se cuela
+// ningún recuadro «Publicidad» vacío, que da aspecto de sitio a medio montar.
+if (SITE.adsense) {
+  const conBloque = [...html].filter(([, h]) => h.includes('adsbygoogle')).length;
+  if (conBloque < indexables.length - 3) aviso(`solo ${conBloque} páginas tienen bloque publicitario`);
+} else if (!SITE.huecosVisibles) {
+  const conMarcador = [...html].filter(([, h]) => h.includes('hueco-marco')).map(([r]) => r);
+  if (conMarcador.length) fallo(`recuadros de publicidad vacíos en: ${conMarcador.join(', ')}`);
+}
 
 // Sin identificador de AdSense no debe emitirse ningún script de Google
 const conScriptGoogle = [...html].filter(([, h]) => h.includes('googlesyndication')).map(([r]) => r);

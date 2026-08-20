@@ -70,6 +70,16 @@ filtros de EasyList. Como ese módulo lo importan todas las vistas, el navegador
 se quedaba con la URL cambiada y el contenido anterior: rota para quien usa bloqueador, que en España
 es muchísima gente. Por eso ahora es `components/hueco.js`, `utils/publicidad.js` y clases
 `hueco-marco`/`hueco-banner`. **Nada relacionado con publicidad lleva «ad» en el nombre.**
+
+**Huecos vacíos a la vista.** `hueco()` no emite nada mientras `SITE.adsense` esté sin rellenar:
+un recuadro gris con la palabra «Publicidad» y ningún anuncio dentro no aporta al usuario y es
+exactamente la señal de «sitio a medio montar» que penaliza la revisión de AdSense. Los altos
+siguen en el CSS, así que rellenar `adsense` + `adSlots` los devuelve con CLS = 0.
+Para revisar la maqueta, `SITE.huecosVisibles = true`. Consecuencia a tener presente:
+**el margen entre secciones nunca puede vivir en el `className` del hueco**, porque desaparece
+con él. Si dos bloques necesitan aire, el aire va en el contenedor (`home.js` lo hace con
+`container-x pt-12`). Las vistas que envuelven un hueco en columna propia —`satelite.js` y
+`contrasena.js`— consultan `hayHueco(formato)` para no dejar media rejilla en blanco.
 (`data-ad-slot` es la excepción: lo exige AdSense.)
 
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
@@ -147,15 +157,18 @@ Dos correcciones que costó descubrir y conviene no deshacer:
 
 **Del propietario:**
 - Rellenar `SITE.titular` si decide monetizar (nombre, NIF, localidad). Hoy vacío a propósito.
-- Activar Cloudflare Web Analytics (gratis, sin cookies, no requiere consentimiento).
-- Dar de alta en Bing Webmaster Tools importando desde Search Console.
+- ~~Activar Cloudflare Web Analytics~~ hecho: mide y registra Core Web Vitals.
+- ~~Dar de alta en Bing Webmaster Tools~~ hecho.
+- ~~Desactivar *Email Address Obfuscation*~~ hecho: Cloudflare reescribía
+  `hola@utilifast.com` como `[email protected]` y sin JavaScript no había contacto visible.
 - Solicitar AdSense **a las 2-4 semanas**, con contenido ya indexado. Pedirlo antes es el camino
   corto al rechazo por «contenido de escaso valor».
 
 **Técnico:**
 - Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres.
 - `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
-- AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido `ads.txt`.
+- AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido
+  `ads.txt` y los huecos, que hoy no se emiten.
 
 ## Comprobado en producción (20 de agosto de 2026)
 

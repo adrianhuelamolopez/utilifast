@@ -47,5 +47,9 @@ export const SITE = {
     rectangle: '', //   300x250 dentro del artículo
     halfpage: '', //    300x600 columna lateral
   },
+  // 3) Recuadros grises con la palabra «Publicidad» donde irán los anuncios.
+  //    En producción van ocultos: un hueco vacío no aporta nada al usuario y da
+  //    aspecto de sitio a medio montar. Ponlo a true solo para revisar la maqueta.
+  huecosVisibles: false,
   titleTemplate: (t) => (t ? `${t} · UtiliFast` : 'UtiliFast'),
 };
