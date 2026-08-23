@@ -199,10 +199,36 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   semana, no en tandas**: no existe límite de páginas en Google —el *crawl budget* empieza a importar
   a partir de miles de URLs y aquí hay 20—, pero un dominio recién nacido que pasa de 20 a 50 páginas
   con la misma plantilla en una semana tiene el perfil del contenido generado en masa.
-  A partir de la semana 3 (≈10 de septiembre de 2026) hay que escribirlas **contra las impresiones
-  reales de Search Console**, no adivinando: qué consultas ya rozan el sitio vale más que cualquier
-  lista hecha a priori. Candidatas mientras tanto: «amortizar 200 al mes», «calorías para perder
-  5 kilos», «Madrid-Barcelona en coche», «sección de cable para faros LED».
+  Hay que escribirlas **contra las impresiones reales de Search Console**, no adivinando.
+  Ya hay datos (23 de agosto de 2026, 45 impresiones): **15 de las 21 consultas visibles son de
+  gasolina y coste de viaje**, y `/gasolina` acumula 19 impresiones frente a 2 de `/hipoteca` y 2 de
+  `/calorias`. Las candidatas escritas a ciegas —«amortizar 200 al mes», «calorías para perder
+  5 kilos»— apuntaban a las zonas **más débiles**; descartadas. Las dos siguientes salen de consultas
+  reales ya registradas: **«cuánto cuesta el kilómetro en coche»** (consultas *coste km coche*,
+  *precio gasolina kilometraje*) y **«amortizar hipoteca o invertir»** (consulta literal
+  *amortizar hipoteca o invertir calculadora*, y se responde combinando `calc/hipoteca` con
+  `calc/interes`).
+
+- **Internacionalización, pedida el 23 de agosto de 2026.** El 18 % de las impresiones ya viene de
+  Latinoamérica (México 4, Perú, Guatemala, El Salvador, Colombia) y un 11 % de EE. UU. Por orden de
+  gravedad, no de tamaño:
+  1. **Unidades de consumo en `/gasolina` — esto es un fallo, no una mejora.** El campo está fijo en
+     `l/100 km`. México y buena parte de Latinoamérica razonan en **km/l**, y Colombia, Perú y
+     EE. UU. reposan en **galones**. Quien mete «12» pensando en km/l recibe un número disparatado
+     sin ningún aviso. Afecta justo a la página con más tracción del sitio.
+  2. **Tipos de IVA de otros países.** La herramienta **ya acepta cualquier tipo** en el campo «Otro
+     tipo»; solo faltan presets (México 16, Colombia 19, Perú 18, Chile 19, Argentina 21). Trabajo
+     mínimo. Ojo: EE. UU. no tiene IVA sino *sales tax*, que varía por estado y **se suma**, no viene
+     incluido; no se puede mapear a esta herramienta.
+  3. **Moneda.** `money()` tiene `currency: 'EUR'` fijo en `src/utils/format.js`. Cambiar el
+     **símbolo** (€ → $ / MXN…) es barato y es lo que se pidió. **Convertir entre monedas no**: haría
+     falta una cotización en vivo, y eso rompe la promesa de «todo el cálculo ocurre en tu
+     dispositivo, sin enviar datos», que es el argumento de venta del sitio entero y lo que dice
+     `/quienes-somos`. Si algún día se hace, con tipo de cambio introducido a mano.
+
+  Contrapeso a tener presente: **España es el 63 % de las impresiones** y el RPM publicitario español
+  multiplica varias veces al latinoamericano. Esto se hace porque dar resultados erróneos es
+  inaceptable, no porque el tráfico latino vaya a pagar las facturas.
 - `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
 - AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido
   `ads.txt` y los huecos, que hoy no se emiten.
