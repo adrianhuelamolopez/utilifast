@@ -24,7 +24,10 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 - **PUBLICADO** en `https://utilifast.com` (Cloudflare Pages, despliegue automático desde `main`).
   Correo `hola@utilifast.com` enrutado con Cloudflare Email Routing.
 - Search Console verificado por **propiedad de Dominio**; sitemap enviado y en estado «Correcto»
-  con las 20 páginas descubiertas (20 de agosto de 2026). La indexación tarda de 1 a 3 semanas.
+  con las 20 páginas descubiertas (20 de agosto de 2026).
+- **Las 20 páginas quedaron indexadas el 22 de agosto de 2026**, dos días después de publicar.
+  Primeras 45 impresiones, posición media 46,8 y 0 clics: la secuencia normal, aparecer abajo
+  antes de subir.
 - `www.utilifast.com` redirige con 301 a la versión sin www mediante una **Redirect Rule** de
   Cloudflare (el `_redirects` de Pages no sirve: solo admite rutas relativas, no cambios de dominio).
 
@@ -127,6 +130,13 @@ redirige con un 308 desde `/hipoteca`, que es justo la URL de los canonical y de
 habría reportado «página con redirección» en las 20 URLs. Por eso el prerender escribe **ficheros
 planos** (`hipoteca.html`), que Pages sirve directamente en `/hipoteca`. **No vuelvas al esquema de
 carpeta con `index.html`.** El plugin de `vite preview` y el auditor asumen el esquema plano.
+
+**«Página con redirección» en Search Console no es un fallo.** Google avisa por correo de que
+3 URLs no se indexan por este motivo, y las tres son variantes de la raíz:
+`http://www.utilifast.com/`, `https://www.utilifast.com/` y `http://utilifast.com/`. Son
+exactamente las redirecciones 301 que montamos: Google sigue la redirección e indexa el destino.
+**No quitar esas redirecciones para «arreglar» el aviso**: sin ellas la misma web quedaría indexada
+cuatro veces compitiendo consigo misma. El aviso es informativo y debe seguir ahí.
 
 **El sitemap no está en el repositorio y es correcto que no esté.** Se genera en cada build dentro de
 `dist/`, que está en `.gitignore`. Committearlo lo dejaría desactualizado en cuanto cambiara una ruta.
