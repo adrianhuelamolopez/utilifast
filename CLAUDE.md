@@ -243,7 +243,7 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   corto al rechazo por «contenido de escaso valor».
 
 **Técnico:**
-- Más páginas satélite: es el punto de mayor impacto del plan y solo hay tres. **De dos en dos por
+- Más páginas satélite: es el punto de mayor impacto del plan y ya hay cinco. **De dos en dos por
   semana, no en tandas**: no existe límite de páginas en Google —el *crawl budget* empieza a importar
   a partir de miles de URLs y aquí hay 20—, pero un dominio recién nacido que pasa de 20 a 50 páginas
   con la misma plantilla en una semana tiene el perfil del contenido generado en masa.
