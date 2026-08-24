@@ -2,10 +2,19 @@ import { hueco } from '../components/hueco.js';
 import { pageHeader, breadcrumbs, privacyNote, seoArticle, faq, panelTitle } from '../components/ui.js';
 import { icon } from '../components/icons.js';
 import { SITE } from '../config.js';
-import { money, decimal, readNumber, clamp } from '../utils/format.js';
+import { money, currencySymbol, decimal, readNumber, clamp } from '../utils/format.js';
 import { qs, listeners } from '../utils/dom.js';
 import { bindCopyButton } from '../utils/clipboard.js';
 import { viaje } from '../calc/gasolina.js';
+import {
+  SISTEMAS,
+  SISTEMA_POR_DEFECTO,
+  sistema,
+  aKm,
+  desdeKm,
+  desdeLitros,
+  aPrecioPorLitro,
+} from '../calc/unidades.js';
 
 // Los metadatos viven en src/meta.js para que la navegación pueda importarlos
 // sin arrastrar el código de esta vista, que se carga bajo demanda.
@@ -14,10 +23,11 @@ export { meta };
 
 const DEFAULTS = { km: 300, consumo: 6, precio: 1.559, peajes: 0, ocupantes: 4, idaVuelta: false };
 
-const CONSUMO_PRESETS = [
-  { label: 'Ciudad', value: 8 },
-  { label: 'Mixto', value: 6 },
-  { label: 'Carretera', value: 5 },
+// Solo el símbolo: aquí no se convierte nada, se elige cómo se escribe la cifra.
+const MONEDAS = [
+  { code: 'EUR', label: '€' },
+  { code: 'USD', label: '$' },
+  { code: 'MXN', label: 'MXN' },
 ];
 
 /** Campo numérico con sufijo de unidad. */
@@ -67,6 +77,25 @@ export function render() {
             </label>
           </div>
 
+          <!-- Sistema de medida: en México se razona en km/l y en EE. UU. en mpg.
+               Sin declararlo, un «12» en km/l se calculaba como 12 l/100 km. -->
+          <div class="sm:col-span-2">
+            <label class="field-label" for="sistema">Cómo mides el consumo</label>
+            <div class="grid gap-2 sm:grid-cols-3" role="group" aria-label="Sistema de medida">
+              ${Object.values(SISTEMAS)
+                .map(
+                  (s) => `
+                <button type="button" data-sistema="${s.id}"
+                        aria-pressed="${s.id === SISTEMA_POR_DEFECTO}"
+                        class="tipo-card group rounded-xl border border-line bg-surface p-2.5 text-left transition hover:border-line-strong">
+                  <span class="block text-sm font-semibold text-content">${s.etiqueta}</span>
+                  <span class="mt-0.5 block text-2xs text-content-subtle">${s.donde}</span>
+                </button>`
+                )
+                .join('')}
+            </div>
+          </div>
+
           <div>
             ${numberField({
               id: 'consumo',
@@ -74,14 +103,8 @@ export function render() {
               unit: 'l/100 km',
               value: DEFAULTS.consumo,
             })}
-            <div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Consumos habituales">
-              ${CONSUMO_PRESETS.map(
-                (p) =>
-                  `<button type="button" class="chip !py-1 !text-xs" data-preset-consumo="${p.value}">${
-                    p.label
-                  } · ${decimal(p.value, 1)}</button>`
-              ).join('')}
-            </div>
+            <div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Consumos habituales"
+                 id="presets-consumo"></div>
           </div>
 
           <div>
@@ -93,6 +116,13 @@ export function render() {
               step: '0.001',
               hint: 'Consulta el precio del día en la gasolinera o en la app de tu tarjeta.',
             })}
+            <div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Moneda">
+              ${MONEDAS.map(
+                (m) => `
+                <button type="button" class="chip !py-1 !text-xs" data-moneda="${m.code}"
+                        aria-pressed="${m.code === 'EUR'}">${m.label}</button>`
+              ).join('')}
+            </div>
           </div>
 
           <div>
@@ -150,11 +180,11 @@ export function render() {
                 <dd class="stat-value" id="out-combustible">—</dd>
               </div>
               <div class="stat">
-                <dt class="stat-label">Litros</dt>
+                <dt class="stat-label" id="label-volumen">Litros</dt>
                 <dd class="stat-value" id="out-litros">—</dd>
               </div>
               <div class="stat">
-                <dt class="stat-label">Coste por km</dt>
+                <dt class="stat-label" id="label-distancia">Coste por km</dt>
                 <dd class="stat-value" id="out-km">—</dd>
               </div>
             </dl>
@@ -249,6 +279,14 @@ export function render() {
         a: 'Por defecto calcula combustible más peajes. Si quieres repercutir mantenimiento y neumáticos, una regla habitual es sumar entre 0,03 € y 0,06 € por kilómetro en el campo de peajes.',
       },
       {
+        q: '¿Puedo calcularlo en kilómetros por litro o en millas por galón?',
+        a: 'Sí. Arriba puedes elegir entre l/100 km, que es como se mide en España y Europa, km/l, habitual en México, Argentina y Chile, y millas por galón, que es el sistema de Estados Unidos. Al cambiarlo se convierten también la distancia, el precio del carburante y el resultado, así que no tienes que hacer ninguna cuenta a mano.',
+      },
+      {
+        q: '¿Puedo poner el precio en dólares o en pesos?',
+        a: 'Sí, junto al precio del carburante puedes elegir la moneda con la que se escriben todos los importes. Ten en cuenta que solo cambia el símbolo: la calculadora no convierte divisas, porque para eso haría falta consultar una cotización en internet y aquí no sale ningún dato de tu dispositivo. Introduce el precio en la moneda que hayas elegido.',
+      },
+      {
         q: '¿Sirve para coches eléctricos?',
         a: 'Sí. Introduce el consumo en kWh/100 km en el campo de consumo y el precio del kWh en el de carburante: la fórmula es idéntica.',
       },
@@ -273,11 +311,18 @@ export function mount(root) {
     idaVuelta: el('idaVuelta'),
   };
 
+  // Estado de presentación. El cálculo interno es siempre km + l/100 km:
+  // `calc/gasolina.js` no sabe nada de sistemas y las satélites dependen de eso.
+  let sistemaId = SISTEMA_POR_DEFECTO;
+  let moneda = 'EUR';
+  const eur = (v) => money(v, moneda);
+
   function compute() {
+    const s = sistema(sistemaId);
     return viaje({
-      km: readNumber(inputs.km.value),
-      consumo: readNumber(inputs.consumo.value),
-      precio: readNumber(inputs.precio.value),
+      km: aKm(readNumber(inputs.km.value), sistemaId),
+      consumo: s.aL100km(readNumber(inputs.consumo.value)),
+      precio: aPrecioPorLitro(readNumber(inputs.precio.value), sistemaId),
       peajes: readNumber(inputs.peajes.value),
       ocupantes: clamp(Math.round(readNumber(inputs.ocupantes.value, 1)), 1, 9),
       idaVuelta: inputs.idaVuelta.checked,
@@ -285,13 +330,17 @@ export function mount(root) {
   }
 
   function summary(r) {
+    const s = sistema(sistemaId);
     return [
       '🚗 Reparto del viaje',
-      `• Distancia: ${decimal(r.km, 0)} km`,
-      `• Consumo: ${decimal(r.consumo, 1)} l/100 km · ${decimal(r.litros, 1)} l`,
-      `• Carburante: ${money(r.combustible)}${r.peajes > 0 ? ` · Peajes: ${money(r.peajes)}` : ''}`,
-      `• Total: ${money(r.total)}`,
-      `• Somos ${r.ocupantes} ➜ ${money(r.porPersona)} por persona`,
+      `• Distancia: ${decimal(desdeKm(r.km, sistemaId), 0)} ${s.unidadDistancia}`,
+      `• Consumo: ${decimal(s.desdeL100km(r.consumo), 1)} ${s.unidadConsumo} · ${decimal(
+        desdeLitros(r.litros, sistemaId),
+        1
+      )} ${s.unidadVolumen}`,
+      `• Carburante: ${eur(r.combustible)}${r.peajes > 0 ? ` · Peajes: ${eur(r.peajes)}` : ''}`,
+      `• Total: ${eur(r.total)}`,
+      `• Somos ${r.ocupantes} ➜ ${eur(r.porPersona)} por persona`,
       '',
       `Calculado con ${SITE.name}`,
     ].join('\n');
@@ -300,15 +349,27 @@ export function mount(root) {
   let current = compute();
 
   function update() {
+    const s = sistema(sistemaId);
     current = compute();
-    el('out-persona').textContent = money(current.porPersona);
+    el('out-persona').textContent = eur(current.porPersona);
     el('out-personas-detalle').innerHTML = `${icon('users', { class: 'h-4 w-4 opacity-80' })} ${
       current.ocupantes
-    } ${current.ocupantes === 1 ? 'ocupante' : 'ocupantes'} · ${decimal(current.km, 0)} km`;
-    el('out-total').textContent = money(current.total);
-    el('out-combustible').textContent = money(current.combustible);
-    el('out-litros').textContent = `${decimal(current.litros, 1)} l`;
-    el('out-km').textContent = `${decimal(current.porKm, 3)} €`;
+    } ${current.ocupantes === 1 ? 'ocupante' : 'ocupantes'} · ${decimal(
+      desdeKm(current.km, sistemaId),
+      0
+    )} ${s.unidadDistancia}`;
+    el('out-total').textContent = eur(current.total);
+    el('out-combustible').textContent = eur(current.combustible);
+    el('out-litros').textContent = `${decimal(desdeLitros(current.litros, sistemaId), 1)} ${
+      s.unidadVolumen
+    }`;
+    // El coste por unidad de distancia se recalcula sobre la distancia mostrada:
+    // en millas el número es mayor que en kilómetros y debe cuadrar con el total.
+    const distancia = desdeKm(current.km, sistemaId);
+    el('out-km').textContent = `${decimal(
+      distancia > 0 ? current.total / distancia : 0,
+      3
+    )} ${currencySymbol(moneda)}`;
 
     const pctComb = current.total > 0 ? (current.combustible / current.total) * 100 : 100;
     el('bar-combustible').style.width = `${pctComb}%`;
@@ -321,12 +382,80 @@ export function mount(root) {
     el('share-wa').href = `https://wa.me/?text=${encodeURIComponent(text)}`;
   }
 
+  /** Sufijo de unidad de un campo (el <span> que pinta `numberField`). */
+  const afijo = (input) => input.parentElement.querySelector('.input-affix');
+
+  /** Repinta todo lo que depende del sistema o de la moneda. */
+  function refrescarUnidades() {
+    const s = sistema(sistemaId);
+    const simbolo = currencySymbol(moneda);
+
+    afijo(inputs.km).textContent = s.unidadDistancia;
+    afijo(inputs.consumo).textContent = s.unidadConsumo;
+    afijo(inputs.precio).textContent = `${simbolo}/${s.volumenPorUnidad}`;
+    afijo(inputs.peajes).textContent = simbolo;
+
+    el('label-volumen').textContent = s.unidadVolumen === 'gal' ? 'Galones' : 'Litros';
+    el('label-distancia').textContent = `Coste por ${s.unidadDistancia === 'mi' ? 'milla' : 'km'}`;
+
+    // Los consumos de referencia son los mismos coches expresados en otra escala.
+    el('presets-consumo').innerHTML = s.presets
+      .map(
+        (p) =>
+          `<button type="button" class="chip !py-1 !text-xs" data-preset-consumo="${p.value}">${
+            p.label
+          } · ${decimal(p.value, 1)}</button>`
+      )
+      .join('');
+
+    root.querySelectorAll('[data-sistema]').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.sistema === sistemaId))
+    );
+    root.querySelectorAll('[data-moneda]').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.moneda === moneda))
+    );
+  }
+
   Object.values(inputs).forEach((input) => L.on(input, 'input', update));
   L.on(inputs.idaVuelta, 'change', update);
 
-  root.querySelectorAll('[data-preset-consumo]').forEach((btn) =>
+  // Delegación: los chips de consumo se regeneran al cambiar de sistema, así que
+  // no se les puede enganchar un listener de una vez para siempre.
+  L.on(el('presets-consumo'), 'click', (e) => {
+    const btn = e.target.closest('[data-preset-consumo]');
+    if (!btn) return;
+    inputs.consumo.value = btn.dataset.presetConsumo;
+    update();
+  });
+
+  root.querySelectorAll('[data-sistema]').forEach((btn) =>
     L.on(btn, 'click', () => {
-      inputs.consumo.value = btn.dataset.presetConsumo;
+      const anterior = sistema(sistemaId);
+      const nuevo = sistema(btn.dataset.sistema);
+      if (nuevo.id === sistemaId) return;
+      // Se convierte lo que ya había escrito en lugar de dejar el número tal cual:
+      // cambiar de escala no debería cambiar el coche que el usuario tenía en mente.
+      const enL100 = anterior.aL100km(readNumber(inputs.consumo.value));
+      const km = aKm(readNumber(inputs.km.value), sistemaId);
+      const precioLitro = aPrecioPorLitro(readNumber(inputs.precio.value), sistemaId);
+
+      sistemaId = nuevo.id;
+      inputs.consumo.value = decimal(nuevo.desdeL100km(enL100), 1).replace(',', '.');
+      inputs.km.value = decimal(desdeKm(km, sistemaId), 0).replace(/\./g, '').replace(',', '.');
+      inputs.precio.value = decimal(
+        nuevo.volumenPorUnidad === 'gal' ? precioLitro * 3.785411784 : precioLitro,
+        3
+      ).replace(',', '.');
+
+      refrescarUnidades();
+      update();
+    })
+  );
+
+  root.querySelectorAll('[data-moneda]').forEach((btn) =>
+    L.on(btn, 'click', () => {
+      moneda = btn.dataset.moneda;
+      refrescarUnidades();
       update();
     })
   );
@@ -340,12 +469,17 @@ export function mount(root) {
   );
 
   L.on(el('reset'), 'click', () => {
+    // Restablecer vuelve también al sistema y la moneda de partida: si no, los
+    // valores por defecto (300, 6, 1,559) se pintarían bajo unidades ajenas.
+    sistemaId = SISTEMA_POR_DEFECTO;
+    moneda = 'EUR';
     inputs.km.value = DEFAULTS.km;
     inputs.consumo.value = DEFAULTS.consumo;
     inputs.precio.value = DEFAULTS.precio;
     inputs.peajes.value = DEFAULTS.peajes;
     inputs.ocupantes.value = DEFAULTS.ocupantes;
     inputs.idaVuelta.checked = DEFAULTS.idaVuelta;
+    refrescarUnidades();
     update();
   });
 
@@ -353,6 +487,7 @@ export function mount(root) {
 
   bindCopyButton(el('copy-wa'), () => summary(current), { label: 'Copiar resumen' });
 
+  refrescarUnidades();
   update();
   return () => L.destroy();
 }

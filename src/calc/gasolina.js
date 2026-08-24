@@ -10,6 +10,10 @@ export function viaje({ km, consumo, precio, peajes = 0, ocupantes = 1, idaVuelt
   const personas = Math.max(1, Math.round(ocupantes));
   return {
     km: distancia,
+    // Se devuelve tal cual para que quien pinte el resultado no tenga que
+    // volver a leerlo del formulario: el resumen de WhatsApp lo daba por
+    // incluido y publicaba «Consumo: 0,0 l/100 km» en todos los viajes.
+    consumo: Math.max(0, consumo),
     litros,
     combustible,
     peajes: Math.max(0, peajes),

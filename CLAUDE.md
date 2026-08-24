@@ -105,6 +105,26 @@ con él. Si dos bloques necesitan aire, el aire va en el contenedor (`home.js` l
 `contrasena.js`— consultan `hayHueco(formato)` para no dejar media rejilla en blanco.
 (`data-ad-slot` es la excepción: lo exige AdSense.)
 
+**Unidades: el cálculo interno es siempre km + l/100 km.** `calc/gasolina.js` no sabe nada de
+sistemas de medida y **las satélites dependen de eso**. `calc/unidades.js` solo traduce lo que
+escribe el usuario antes de entrar y lo que se pinta al salir. Si añades un sistema nuevo, va ahí,
+no en la vista. Cubre `l/100 km`, `km/l` (México, Argentina, Chile) y `mpg` (EE. UU., que arrastra
+millas y galones). Colombia y Perú combinan km con galones y **no está cubierto a propósito**: cada
+opción extra es una decisión más que tomar antes de calcular nada.
+
+**Moneda: se cambia el símbolo, nunca se convierte.** `money(v, currency)` acepta divisa y
+`currencySymbol(currency)` da el símbolo **desde el mismo formateador** — escribirlo a mano se
+desincroniza, porque en `es-ES` el dólar se escribe `US$` y no `$`, y el total y el coste por
+kilómetro acababan con símbolos distintos. **Convertir divisas queda descartado**: exigiría pedir una
+cotización a un servidor y rompería la promesa de «ningún dato sale de tu dispositivo», que es el
+argumento de venta del sitio y lo que afirma `/quienes-somos`.
+
+**Devolver del módulo de cálculo todo lo que el resultado va a pintar.** `viaje()` no devolvía
+`consumo`, y el resumen que se comparte por WhatsApp hacía `decimal(undefined)` → publicaba
+**«Consumo: 0,0 l/100 km»** en todos los viajes desde el primer día. `decimal()` e `integer()`
+convierten lo no finito en 0 en lugar de fallar, así que un dato que falta **no se nota**: sale un
+cero perfectamente formateado. Si pintas un campo, comprueba que el módulo lo devuelve.
+
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en
 `src/calc/` (`hipoteca`, `gasolina`, `neumaticos`, `interes`) y las importan **tanto la vista como el
@@ -209,25 +229,16 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   *amortizar hipoteca o invertir calculadora*, y se responde combinando `calc/hipoteca` con
   `calc/interes`).
 
-- **Internacionalización, pedida el 23 de agosto de 2026.** El 18 % de las impresiones ya viene de
-  Latinoamérica (México 4, Perú, Guatemala, El Salvador, Colombia) y un 11 % de EE. UU. Por orden de
-  gravedad, no de tamaño:
-  1. **Unidades de consumo en `/gasolina` — esto es un fallo, no una mejora.** El campo está fijo en
-     `l/100 km`. México y buena parte de Latinoamérica razonan en **km/l**, y Colombia, Perú y
-     EE. UU. reposan en **galones**. Quien mete «12» pensando en km/l recibe un número disparatado
-     sin ningún aviso. Afecta justo a la página con más tracción del sitio.
-  2. **Tipos de IVA de otros países.** La herramienta **ya acepta cualquier tipo** en el campo «Otro
-     tipo»; solo faltan presets (México 16, Colombia 19, Perú 18, Chile 19, Argentina 21). Trabajo
-     mínimo. Ojo: EE. UU. no tiene IVA sino *sales tax*, que varía por estado y **se suma**, no viene
-     incluido; no se puede mapear a esta herramienta.
-  3. **Moneda.** `money()` tiene `currency: 'EUR'` fijo en `src/utils/format.js`. Cambiar el
-     **símbolo** (€ → $ / MXN…) es barato y es lo que se pidió. **Convertir entre monedas no**: haría
-     falta una cotización en vivo, y eso rompe la promesa de «todo el cálculo ocurre en tu
-     dispositivo, sin enviar datos», que es el argumento de venta del sitio entero y lo que dice
-     `/quienes-somos`. Si algún día se hace, con tipo de cambio introducido a mano.
+- **Internacionalización, pedida el 23 de agosto de 2026.** El 18 % de las impresiones viene de
+  Latinoamérica y un 11 % de EE. UU. Hecho el 24 de agosto: **unidades de consumo y moneda en
+  `/gasolina`** (ver más abajo en las trampas). Queda pendiente:
+  **tipos de IVA de otros países** — la herramienta **ya acepta cualquier tipo** en el campo «Otro
+  tipo», solo faltan presets (México 16, Colombia 19, Perú 18, Chile 19, Argentina 21). Ojo:
+  EE. UU. no tiene IVA sino *sales tax*, que varía por estado y **se suma** en vez de venir incluido;
+  no se puede mapear a esta herramienta y forzarlo daría resultados falsos.
 
   Contrapeso a tener presente: **España es el 63 % de las impresiones** y el RPM publicitario español
-  multiplica varias veces al latinoamericano. Esto se hace porque dar resultados erróneos es
+  multiplica varias veces al latinoamericano. Esto se hizo porque dar resultados erróneos es
   inaceptable, no porque el tráfico latino vaya a pagar las facturas.
 - `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
 - AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido
