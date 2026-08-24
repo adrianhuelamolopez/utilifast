@@ -115,6 +115,14 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Los navegadores dan a <fieldset> un min-width:min-content que le impide
+     encogerse por debajo de su contenido. En /macros eso estiraba el formulario
+     a 562 px dentro de una pantalla de 375 y hacía desbordar la página entera
+     en horizontal. No es un ajuste estético: rompe la lectura en móvil. */
+  fieldset {
+    min-width: 0;
+  }
+
   ::selection {
     background: rgb(var(--accent) / 0.22);
   }
@@ -293,9 +301,12 @@
   .segmented {
     @apply inline-flex w-full gap-1 rounded-xl bg-surface-muted p-1 ring-1 ring-inset ring-line;
   }
+  /* `min-w-0`: un elemento flexible no baja de su ancho de contenido salvo que se
+     le permita, y con etiquetas largas («Calcular por peso») eso estiraba el
+     formulario de /macros hasta 562 px dentro de una pantalla de 375. */
   .segmented-item {
-    @apply flex-1 cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-medium text-content-muted transition
-      hover:text-content;
+    @apply min-w-0 flex-1 cursor-pointer rounded-lg px-3 py-2 text-center text-sm font-medium text-content-muted
+      transition hover:text-content;
   }
   .segmented-item[aria-pressed='true'] {
     @apply bg-surface text-content shadow-subtle;

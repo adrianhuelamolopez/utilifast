@@ -17,7 +17,7 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 
 ## Estado actual
 
-- **14 herramientas** + 3 páginas satélite + `/quienes-somos` + `/legal` = **20 rutas prerenderizadas**.
+- **14 herramientas** + 5 páginas satélite + `/quienes-somos` + `/legal` = **22 rutas prerenderizadas**.
 - Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
 - Artículos de 333–496 palabras por herramienta. Los satélites van de **318 a 432** (medido, no
   estimado: la nota anterior decía ~270 y era falsa), más el bloque de respuesta con las cifras.
@@ -124,6 +124,21 @@ argumento de venta del sitio y lo que afirma `/quienes-somos`.
 **«Consumo: 0,0 l/100 km»** en todos los viajes desde el primer día. `decimal()` e `integer()`
 convierten lo no finito en 0 en lugar de fallar, así que un dato que falta **no se nota**: sale un
 cero perfectamente formateado. Si pintas un campo, comprueba que el módulo lo devuelve.
+
+**`min-width: auto` en rejillas y flex: la causa de todo desbordamiento horizontal.** Un elemento de
+rejilla o flexible **no baja de su ancho de contenido** salvo que se le ponga `min-w-0`. Con una tabla
+`min-w-[520px]` dentro, la pista entera se estira y **desborda la página completa en móvil** en lugar
+de desplazarse solo la tabla — y basta con que lo haga *uno* de los dos elementos de la pista para
+arrastrar al otro. Ya arreglado en `satelite.js`, en las dos columnas de `macros.js` y en
+`.segmented-item`; los `<fieldset>` llevan además `min-width: 0` en la capa base porque el navegador
+les pone `min-content`. **Al añadir una tabla ancha dentro de una rejilla, `min-w-0` en el elemento
+de la pista, no solo `overflow-x-auto` en el envoltorio.** Se comprueba recorriendo las rutas a
+375 px y mirando `scrollWidth > clientWidth`.
+
+**Backticks dentro de un `render()`.** Las vistas devuelven *template literals*: un backtick en un
+comentario HTML del propio marcado cierra la cadena y rompe el módulo entero con un
+`SyntaxError` que solo se ve en consola, porque el router lo captura. En los comentarios dentro del
+marcado, las clases van sin comillas de código.
 
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en

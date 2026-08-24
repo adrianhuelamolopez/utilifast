@@ -86,7 +86,7 @@ export function render() {
 
     <div class="grid gap-6 lg:grid-cols-12">
       <!-- Formulario -->
-      <form id="macro-form" class="card p-5 sm:p-6 lg:col-span-5" novalidate>
+      <form id="macro-form" class="card min-w-0 p-5 sm:p-6 lg:col-span-5" novalidate>
         ${panelTitle('Tus datos', 'gauge')}
 
         <div class="segmented mb-5" role="group" aria-label="Modo de cálculo">
@@ -171,7 +171,10 @@ export function render() {
       </form>
 
       <!-- Resultados -->
-      <section class="lg:col-span-7" aria-live="polite">
+      <!-- min-w-0 en los dos: la tabla de reparto lleva min-w-[520px] y, como los
+           elementos de rejilla traen min-width:auto, esa anchura estiraba la pista
+           entera y desbordaba la pagina en movil en vez de desplazarse la tabla. -->
+      <section class="min-w-0 lg:col-span-7" aria-live="polite">
         <div class="card p-5 sm:p-6">
           <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
             ${donut()}

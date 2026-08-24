@@ -26,7 +26,11 @@ function render(indice, contenido) {
     ])}
 
     <div class="grid gap-8 lg:grid-cols-12">
-      <div class="${hayHueco('halfpage') ? 'lg:col-span-8' : 'lg:col-span-8 lg:col-start-3'}">
+      <!-- min-w-0 no es decorativo: un elemento de rejilla trae min-width:auto y
+           se niega a encogerse por debajo de su contenido, así que una tabla ancha
+           estira la columna y hace desbordar la página entera en móvil en lugar de
+           desplazarse dentro de su propio contenedor. -->
+      <div class="min-w-0 ${hayHueco('halfpage') ? 'lg:col-span-8' : 'lg:col-span-8 lg:col-start-3'}">
         <header class="mb-8">
           <p class="badge-accent mb-3">
             ${icon(herramienta.icon, { class: 'h-3.5 w-3.5' })} ${escapeHtml(herramienta.navLabel)}

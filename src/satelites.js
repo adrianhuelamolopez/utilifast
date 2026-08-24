@@ -27,6 +27,24 @@ export const SATELITES = [
     load: () => import('./satelites/neumaticos-225-45-r17.js'),
   },
   {
+    path: '/hipoteca/amortizar-o-invertir',
+    herramienta: '/hipoteca',
+    title: '¿Amortizar hipoteca o invertir? La cuenta con números',
+    description:
+      'Amortizar renta exactamente el tipo de tu hipoteca. Comparamos las dos opciones al mismo plazo y con la casa pagada, y sale un punto de equilibrio concreto.',
+    h1: '¿Amortizar la hipoteca o invertir ese dinero?',
+    load: () => import('./satelites/hipoteca-amortizar-o-invertir.js'),
+  },
+  {
+    path: '/gasolina/coste-por-kilometro',
+    herramienta: '/gasolina',
+    title: 'Cuánto cuesta de verdad un kilómetro en coche',
+    description:
+      'El combustible no llega a un tercio de lo que cuesta mover un coche. El desglose completo con seguro, mantenimiento y depreciación, y la cifra oficial de Hacienda.',
+    h1: '¿Cuánto cuesta un kilómetro en coche?',
+    load: () => import('./satelites/gasolina-coste-por-kilometro.js'),
+  },
+  {
     path: '/gasolina/madrid-valencia',
     herramienta: '/gasolina',
     title: 'Cuánto cuesta ir de Madrid a Valencia en coche',
