@@ -20,7 +20,25 @@ const TIPOS_IVA = [
 ];
 
 // Recargo de equivalencia asociado a cada tipo (régimen especial de minoristas).
+// Es un régimen exclusivamente español: con un tipo de otro país da 0, que es
+// justo lo correcto, y por eso las búsquedas se hacen con `?? 0`.
 const RECARGO = { 21: 5.2, 10: 1.4, 4: 0.5, 0: 0 };
+
+/**
+ * Tipos generales de otros países hispanohablantes, verificados para 2026.
+ *
+ * Van como fila secundaria y no como tarjetas: esta herramienta es de IVA
+ * español y es ahí donde compite. Pero el 18 % de las impresiones del sitio
+ * viene de Latinoamérica, y quien llega desde México necesitaba saber que el
+ * campo «Otro tipo» aceptaba su 16 % en vez de marcharse.
+ */
+const TIPOS_PAIS = [
+  { pais: 'México', valor: 16 },
+  { pais: 'Colombia', valor: 19 },
+  { pais: 'Chile', valor: 19 },
+  { pais: 'Perú', valor: 18, nota: 'IGV' },
+  { pais: 'Argentina', valor: 21 },
+];
 
 const TIPOS_IRPF = [
   { valor: 0, label: 'Sin retención' },
@@ -92,6 +110,20 @@ export function render() {
               <input class="input no-spin !py-1.5 pr-8 text-sm" id="iva" type="number"
                      inputmode="decimal" min="0" max="100" step="0.1" value="${DEFAULTS.iva}" />
               <span class="input-affix !pr-3 !text-2xs">%</span>
+            </div>
+          </div>
+
+          <div class="mt-3 border-t border-line pt-3">
+            <p class="text-xs text-content-subtle" id="otros-paises">Tipo general en otros países</p>
+            <div class="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="otros-paises">
+              ${TIPOS_PAIS.map(
+                (p) => `
+                <button type="button" class="chip !py-1 !text-xs" data-tipo-iva="${p.valor}">
+                  ${p.pais} <span class="font-semibold tabular-nums">${p.valor} %</span>${
+                  p.nota ? `<span class="text-content-subtle"> ${p.nota}</span>` : ''
+                }
+                </button>`
+              ).join('')}
             </div>
           </div>
         </div>
@@ -259,7 +291,11 @@ export function render() {
       },
       {
         q: '¿Puedo usar un tipo distinto a los oficiales?',
-        a: 'Sí. El campo «Otro tipo» acepta cualquier porcentaje, útil para operaciones con IVA de otros países o para simulaciones. El recargo de equivalencia solo tiene tipo definido para el 21 %, 10 % y 4 %.',
+        a: 'Sí. El campo «Otro tipo» acepta cualquier porcentaje, útil para simulaciones o para operaciones con impuestos de otros países. El recargo de equivalencia solo tiene tipo definido para el 21 %, 10 % y 4 %.',
+      },
+      {
+        q: '¿Sirve para calcular el IVA de México, Colombia o Argentina?',
+        a: 'Sí. Debajo del campo «Otro tipo» tienes los tipos generales de México (16 %), Colombia (19 %), Chile (19 %), Perú (18 %, allí llamado IGV) y Argentina (21 %). La fórmula es idéntica en todos: para quitar el impuesto de un precio que ya lo incluye se divide entre 1 más el tipo, nunca se resta el porcentaje. Lo que no se aplica fuera de España es el recargo de equivalencia, que es un régimen español para minoristas.',
       },
       {
         q: '¿Se guardan los importes que introduzco?',

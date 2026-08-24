@@ -140,6 +140,19 @@ comentario HTML del propio marcado cierra la cadena y rompe el módulo entero co
 `SyntaxError` que solo se ve en consola, porque el router lo captura. En los comentarios dentro del
 marcado, las clases van sin comillas de código.
 
+**La imagen para compartir se dibuja píxel a píxel, sin librerías.** `scripts/gen-og.mjs` escribe el
+PNG a mano y el texto sale de `scripts/lib/trazos.mjs`, una tipografía de **polilíneas** que se pinta
+midiendo la distancia de cada píxel al trazo más cercano — eso da el antialiasing gratis, sin
+supermuestrear. **Solo hay mayúsculas**, y las que hacían falta: pedir una letra que no existe
+**lanza un error** con la lista de disponibles, porque antes se descartaba en silencio y la palabra
+salía mutilada. Los textos se eligen con ese alfabeto y sin acentos.
+
+Cuidado con el signo de los ángulos: **la Y va hacia abajo**, así que un arco de 180° a 360° pasa por
+*arriba*, no por abajo. Ese error convirtió la U en una «н», la C en un «)» y la S en una «C», y solo
+se ve mirando el PNG. **Después de tocar un glifo hay que abrir la imagen**, no basta con que el
+script no falle. El generador comprueba además que cada línea cabe en el margen y aborta si no.
+`npm run og` se ejecuta a mano y el PNG se versiona, así que **esto no corre en el despliegue**.
+
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en
 `src/calc/` (`hipoteca`, `gasolina`, `neumaticos`, `interes`) y las importan **tanto la vista como el
@@ -244,18 +257,20 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   *amortizar hipoteca o invertir calculadora*, y se responde combinando `calc/hipoteca` con
   `calc/interes`).
 
-- **Internacionalización, pedida el 23 de agosto de 2026.** El 18 % de las impresiones viene de
-  Latinoamérica y un 11 % de EE. UU. Hecho el 24 de agosto: **unidades de consumo y moneda en
-  `/gasolina`** (ver más abajo en las trampas). Queda pendiente:
-  **tipos de IVA de otros países** — la herramienta **ya acepta cualquier tipo** en el campo «Otro
-  tipo», solo faltan presets (México 16, Colombia 19, Perú 18, Chile 19, Argentina 21). Ojo:
-  EE. UU. no tiene IVA sino *sales tax*, que varía por estado y **se suma** en vez de venir incluido;
-  no se puede mapear a esta herramienta y forzarlo daría resultados falsos.
+- **Internacionalización, pedida el 23 de agosto de 2026 y cerrada el 24.** El 18 % de las
+  impresiones viene de Latinoamérica y un 11 % de EE. UU. Hechas las dos partes: **unidades de
+  consumo y moneda en `/gasolina`** y **tipos de otros países en `/iva`** (`TIPOS_PAIS`, verificados
+  para 2026: México 16, Colombia 19, Chile 19, Perú 18 —allí IGV—, Argentina 21). Van como fila
+  secundaria de chips, no como tarjetas: la herramienta es de IVA español y es ahí donde compite.
+
+  **EE. UU. no tiene IVA sino *sales tax***, que varía por estado y **se suma** en vez de venir
+  incluido: no se puede mapear a esta herramienta y forzarlo daría resultados falsos. El recargo de
+  equivalencia es igualmente español y con un tipo extranjero da 0 — correcto, y por eso las
+  búsquedas en `RECARGO` van con `?? 0`.
 
   Contrapeso a tener presente: **España es el 63 % de las impresiones** y el RPM publicitario español
   multiplica varias veces al latinoamericano. Esto se hizo porque dar resultados erróneos es
   inaceptable, no porque el tráfico latino vaya a pagar las facturas.
-- `public/og-default.png` es un marcador generado sin texto; sustituir por un diseño con la marca.
 - AdSense: rellenar `adsense` y `adSlots` en `src/config.js` y todo se activa solo, incluido
   `ads.txt` y los huecos, que hoy no se emiten.
 
