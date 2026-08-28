@@ -60,7 +60,9 @@ for (const [ruta, h] of html) {
   if (!canonical) fallo(`sin canonical: ${ruta}`);
   if (h1 !== 1) fallo(`${h1} etiquetas h1 (debe haber 1): ${ruta}`);
   if (titulo.length > 65) aviso(`título de ${titulo.length} caracteres, Google lo cortará: ${ruta}`);
-  if (desc.length > 165) aviso(`descripción de ${desc.length} caracteres: ${ruta}`);
+  // 158 es el limite que fija el CLAUDE.md; la auditoria avisaba a 165 y dejaba
+  // pasar descripciones que Google corta. Doc y herramienta ahora coinciden.
+  if (desc.length > 158) aviso(`descripción de ${desc.length} caracteres: ${ruta}`);
   if (desc && desc.length < 70 && !esError) aviso(`descripción corta (${desc.length}): ${ruta}`);
 
   for (const [clave, valor] of [['titulo', titulo], ['desc', desc], ['canonical', canonical]]) {

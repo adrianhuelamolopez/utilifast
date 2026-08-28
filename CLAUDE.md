@@ -17,7 +17,7 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 
 ## Estado actual
 
-- **14 herramientas** + 5 páginas satélite + `/quienes-somos` + `/legal` = **22 rutas prerenderizadas**.
+- **14 herramientas** + 7 páginas satélite + `/quienes-somos` + `/legal` = **24 rutas prerenderizadas**.
 - Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
 - Artículos de 333–496 palabras por herramienta. Los satélites van de **318 a 432** (medido, no
   estimado: la nota anterior decía ~270 y era falsa), más el bloque de respuesta con las cifras.
@@ -166,6 +166,23 @@ la siguiente.** Casi nunca coincide con la pregunta que uno tenía en la cabeza.
 De paso se corrigió la cifra: eran **360 km y unas 3 h 45 min**, no 355 km y «tres horas y media».
 Contrastado con el mapa de carreteras del RACE. Íbamos veinte minutos cortos, y ese número ahora es
 el titular de la página.
+
+**Las satélites de ruta comparten `satelites/_ruta.js`.** Tres rutas copiando la misma aritmética
+acaban divergiendo: `respuestaDeRuta({km, minutos, via, peajes})` calcula con `calc/gasolina.js` y
+devuelve el bloque de respuesta ya montado. **Una ruta nueva son cuatro constantes y un artículo
+propio**, nunca una copia del cálculo. Lo que sí debe ser distinto en cada una es el contenido:
+Madrid–Barcelona lleva la AP-2 sin peaje desde 2021 y la comparación con el AVE; Madrid–Sevilla,
+Despeñaperros y el calor del verano. Tres plantillas rellenadas serían contenido de escaso valor.
+
+Distancias y tiempos contrastados con el mapa de carreteras del RACE: Madrid–Valencia 360 km /
+3 h 45 min · Madrid–Barcelona 620 km / 6 h 15 min · Madrid–Sevilla 530 km / 5 h 30 min.
+Son tiempos conservadores, con tráfico realista en los accesos; a velocidad de crucero y con la
+carretera despejada se hacen en bastante menos.
+
+**Doc y auditoría tienen que decir lo mismo.** El `CLAUDE.md` fijaba la descripción en 158
+caracteres y `auditar.mjs` solo avisaba a partir de 165: tres descripciones se publicaron pasadas de
+largo sin que saltara nada. Ahora el umbral del script es 158. **Si cambias un límite documentado,
+cámbialo también en el script, o el script deja de defenderlo.**
 
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en

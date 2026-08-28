@@ -13,7 +13,7 @@ export const SATELITES = [
     herramienta: '/hipoteca',
     title: 'Cuánto ahorro amortizando 100 € al mes en la hipoteca',
     description:
-      'Sobre una hipoteca de 180.000 € al 3,1 % a 25 años, aportar 100 € más cada mes recorta el plazo y ahorra intereses. Cuánto exactamente y por qué compensa tanto.',
+      'Sobre una hipoteca de 180.000 € al 3,1 % a 25 años, aportar 100 € más al mes recorta el plazo y ahorra intereses. Cuánto exactamente y por qué compensa.',
     h1: '¿Cuánto ahorro amortizando 100 € al mes?',
     load: () => import('./satelites/hipoteca-amortizar-100.js'),
   },
@@ -40,7 +40,7 @@ export const SATELITES = [
     herramienta: '/gasolina',
     title: 'Cuánto cuesta de verdad un kilómetro en coche',
     description:
-      'El combustible no llega a un tercio de lo que cuesta mover un coche. El desglose completo con seguro, mantenimiento y depreciación, y la cifra oficial de Hacienda.',
+      'El combustible no llega a un tercio de lo que cuesta mover un coche. Desglose completo con seguro, mantenimiento y depreciación, y la cifra de Hacienda.',
     h1: '¿Cuánto cuesta un kilómetro en coche?',
     load: () => import('./satelites/gasolina-coste-por-kilometro.js'),
   },
@@ -54,6 +54,24 @@ export const SATELITES = [
       'Los 360 km de la A-3 se hacen en unas 3 h 45 min y sin un solo peaje. Cuánta gasolina gasta el viaje, cuánto sale por persona y qué cuesta ir y volver.',
     h1: 'De Madrid a Valencia en coche: distancia, tiempo y coste',
     load: () => import('./satelites/gasolina-madrid-valencia.js'),
+  },
+  {
+    path: '/gasolina/madrid-barcelona',
+    herramienta: '/gasolina',
+    title: 'Madrid a Barcelona en coche: km, tiempo y coste',
+    description:
+      'Son 620 km por la A-2 y unas 6 h 15 min al volante. Desde 2021 no tiene peajes. Cuánta gasolina gasta, cuánto sale por persona y cuándo gana el AVE.',
+    h1: 'De Madrid a Barcelona en coche: distancia, tiempo y coste',
+    load: () => import('./satelites/gasolina-madrid-barcelona.js'),
+  },
+  {
+    path: '/gasolina/madrid-sevilla',
+    herramienta: '/gasolina',
+    title: 'Madrid a Sevilla en coche: km, tiempo y coste',
+    description:
+      'Los 530 km de la A-4 se hacen en unas 5 h 30 min y sin peajes. Cuánta gasolina gasta, por qué Despeñaperros sube el consumo y cuánto sale por persona.',
+    h1: 'De Madrid a Sevilla en coche: distancia, tiempo y coste',
+    load: () => import('./satelites/gasolina-madrid-sevilla.js'),
   },
 ];
 

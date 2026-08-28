@@ -1,5 +1,4 @@
-import { viaje } from '../calc/gasolina.js';
-import { money, decimal, integer } from '../utils/format.js';
+import { respuestaDeRuta } from './_ruta.js';
 
 /**
  * Ruta Madrid–Valencia.
@@ -8,24 +7,15 @@ import { money, decimal, integer } from '../utils/format.js';
  * Google la sube sobre todo por **consultas de distancia**: trece de las catorce
  * que la traen preguntan los kilómetros o el tiempo, no el precio
  * (*distancia madrid valencia*, *km de madrid a valencia*, *madrid valencia
- * coche tiempo*…). El dato estaba, pero enterrado en una fila de la tabla.
- * Por eso ahora la respuesta corta lleva delante los kilómetros y el tiempo, y
- * el coste va inmediatamente después: la página responde las dos preguntas.
+ * coche tiempo*). El dato estaba, pero enterrado en una fila de la tabla.
+ * De ahí salió el patrón que ahora comparten las tres rutas en `_ruta.js`.
  *
  * Distancia y duración contrastadas con el mapa de carreteras del RACE. La cifra
  * anterior —355 km y «tres horas y media»— se quedaba veinte minutos corta.
  */
 
-/** Kilómetros por la A-3 entre ambas capitales. Varía con el punto de partida. */
 const KM = 360;
-
-/** Duración al volante sin paradas, en minutos. */
-const MINUTOS = 225;
-
-const CONSUMO = 6; // l/100 km en autovía
-const PRECIO = 1.559; // €/l
-
-const tiempoTexto = (min) => `${Math.floor(min / 60)} h ${min % 60} min`;
+const MINUTOS = 225; // 3 h 45 min
 
 export default {
   cta: 'Calcular tu propia ruta en la calculadora',
@@ -34,33 +24,13 @@ export default {
   supuesto:
     '360 km por la A-3, consumo medio de 6 l/100 km en autovía y gasolina a 1,559 €/l. La A-3 no tiene peajes. El tiempo es de conducción, sin contar paradas.',
 
-  responde() {
-    const solo = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 1 });
-    const cuatro = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 4 });
-    const idaVuelta = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 4, idaVuelta: true });
-    return {
-      titular: `${integer(KM)} km`,
-      unidad: `y unas ${tiempoTexto(MINUTOS)} al volante`,
-      frase: `El trayecto por la <strong>A-3</strong> son <strong>${integer(
-        KM
-      )} kilómetros</strong> que se recorren en <strong>${tiempoTexto(
-        MINUTOS
-      )}</strong> sin paradas, y no tiene ni un peaje. En combustible se van
-      <strong>${decimal(solo.litros, 1)} litros</strong>, unos <strong>${money(
-        solo.total
-      )}</strong>. Yendo cuatro personas salen <strong>${money(
-        cuatro.porPersona
-      )} por cabeza</strong>, y el fin de semana completo —ida y vuelta— sube a ${money(
-        idaVuelta.porPersona
-      )} cada uno.`,
-      datos: [
-        ['Distancia', `${integer(solo.km)} km`],
-        ['Tiempo al volante', tiempoTexto(MINUTOS)],
-        ['Gasolina solo la ida', money(solo.total)],
-        ['Ida y vuelta entre 4', `${money(idaVuelta.porPersona)} por persona`],
-      ],
-    };
-  },
+  responde: () =>
+    respuestaDeRuta({
+      km: KM,
+      minutos: MINUTOS,
+      via: 'A-3',
+      peajes: 'no tiene ni un peaje',
+    }),
 
   contenido: `
     <h2>La ruta: cuántos kilómetros y cuánto se tarda</h2>
