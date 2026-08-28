@@ -305,10 +305,19 @@ Dos correcciones que costó descubrir y conviene no deshacer:
   para 2026: México 16, Colombia 19, Chile 19, Perú 18 —allí IGV—, Argentina 21). Van como fila
   secundaria de chips, no como tarjetas: la herramienta es de IVA español y es ahí donde compite.
 
+  **IGIC de Canarias añadido el 28 de agosto** tras ver la consulta *calculadora igic* en Search
+  Console. Va en `TIPOS_IGIC`, en su propia fila y **antes** que los tipos extranjeros: Canarias es
+  territorio español y mezclarlo con México o Chile daría a entender lo contrario. Solo los dos tipos
+  que cubren casi cualquier factura (reducido 3 %, general 7 %); los demás —0 %, **1 % para
+  carburantes desde la Ley 9/2025**, 5 %, 9,5 %, 15 % y 20 % del tabaco— se escriben en «Otro tipo» y
+  están enumerados en las preguntas frecuentes.
+
   **EE. UU. no tiene IVA sino *sales tax***, que varía por estado y **se suma** en vez de venir
-  incluido: no se puede mapear a esta herramienta y forzarlo daría resultados falsos. El recargo de
-  equivalencia es igualmente español y con un tipo extranjero da 0 — correcto, y por eso las
-  búsquedas en `RECARGO` van con `?? 0`.
+  incluido: no se puede mapear a esta herramienta y forzarlo daría resultados falsos. Lo mismo con
+  **Ceuta y Melilla**, que aplican el IPSI con tipo variable según el producto: se menciona en las
+  preguntas frecuentes pero no se ofrece como preset. El recargo de equivalencia es igualmente
+  español y con un tipo de fuera da 0 — correcto, y por eso las búsquedas en `RECARGO` van con
+  `?? 0`.
 
   Contrapeso a tener presente: **España es el 63 % de las impresiones** y el RPM publicitario español
   multiplica varias veces al latinoamericano. Esto se hizo porque dar resultados erróneos es

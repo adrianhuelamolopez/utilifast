@@ -40,6 +40,20 @@ const TIPOS_PAIS = [
   { pais: 'Argentina', valor: 21 },
 ];
 
+/**
+ * IGIC: el impuesto que sustituye al IVA en Canarias. Va aparte y **antes** que
+ * los tipos extranjeros porque Canarias es territorio español: mezclarlo con
+ * México o Chile daría a entender que allí no se factura en España.
+ *
+ * Solo los dos tipos que cubren casi cualquier factura. Los demás (0 %, 1 % para
+ * carburantes desde la Ley 9/2025, 5 %, 9,5 %, 15 % y 20 %) se escriben en el
+ * campo «Otro tipo», y las preguntas frecuentes los enumeran.
+ */
+const TIPOS_IGIC = [
+  { label: 'Reducido', valor: 3 },
+  { label: 'General', valor: 7 },
+];
+
 const TIPOS_IRPF = [
   { valor: 0, label: 'Sin retención' },
   { valor: 7, label: '7 % nuevos autónomos' },
@@ -114,6 +128,20 @@ export function render() {
           </div>
 
           <div class="mt-3 border-t border-line pt-3">
+            <p class="text-xs text-content-subtle" id="tipos-igic">
+              Canarias · <abbr title="Impuesto General Indirecto Canario">IGIC</abbr>
+            </p>
+            <div class="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="tipos-igic">
+              ${TIPOS_IGIC.map(
+                (t) => `
+                <button type="button" class="chip !py-1 !text-xs" data-tipo-iva="${t.valor}">
+                  ${t.label} <span class="font-semibold tabular-nums">${decimal(t.valor, 0)} %</span>
+                </button>`
+              ).join('')}
+            </div>
+          </div>
+
+          <div class="mt-3">
             <p class="text-xs text-content-subtle" id="otros-paises">Tipo general en otros países</p>
             <div class="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="otros-paises">
               ${TIPOS_PAIS.map(
@@ -292,6 +320,10 @@ export function render() {
       {
         q: '¿Puedo usar un tipo distinto a los oficiales?',
         a: 'Sí. El campo «Otro tipo» acepta cualquier porcentaje, útil para simulaciones o para operaciones con impuestos de otros países. El recargo de equivalencia solo tiene tipo definido para el 21 %, 10 % y 4 %.',
+      },
+      {
+        q: '¿Sirve para el IGIC de Canarias?',
+        a: 'Sí. En Canarias no se aplica el IVA sino el IGIC, y tienes sus dos tipos más habituales a un clic: el general del 7 % y el reducido del 3 %. Los demás se escriben en «Otro tipo»: existe un tipo cero para pan, leche, libros o medicamentos, un 1 % para carburantes introducido por la Ley 9/2025 de Presupuestos de Canarias, un 5 %, dos tipos incrementados del 9,5 % y el 15 %, y un 20 % para las labores del tabaco. En Ceuta y Melilla no rige ninguno de los dos: allí se aplica el IPSI, cuyo tipo varía según el producto.',
       },
       {
         q: '¿Sirve para calcular el IVA de México, Colombia o Argentina?',
