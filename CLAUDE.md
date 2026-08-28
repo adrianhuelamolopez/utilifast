@@ -153,6 +153,20 @@ se ve mirando el PNG. **Después de tocar un glifo hay que abrir la imagen**, no
 script no falle. El generador comprueba además que cada línea cabe en el margen y aborta si no.
 `npm run og` se ejecuta a mano y el PNG se versiona, así que **esto no corre en el despliegue**.
 
+**Escribir la satélite para la pregunta que creemos, no para la que buscan.** Madrid–Valencia se
+escribió respondiendo «cuánto cuesta». A la semana, Search Console enseñó que **trece de las catorce
+consultas que la traen preguntan la distancia o el tiempo** (*distancia madrid valencia*, *km de
+madrid a valencia*, *madrid valencia coche tiempo*), y que Google ya la subía a la posición 17 por
+ellas. El dato de los kilómetros estaba, pero enterrado en una fila de la tabla. Ahora la respuesta
+corta lleva delante los km y el tiempo, y el coste va justo detrás.
+
+**Lección general: publicada la satélite, mirar por qué consultas entra de verdad antes de escribir
+la siguiente.** Casi nunca coincide con la pregunta que uno tenía en la cabeza.
+
+De paso se corrigió la cifra: eran **360 km y unas 3 h 45 min**, no 355 km y «tres horas y media».
+Contrastado con el mapa de carreteras del RACE. Íbamos veinte minutos cortos, y ese número ahora es
+el titular de la página.
+
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en
 `src/calc/` (`hipoteca`, `gasolina`, `neumaticos`, `interes`) y las importan **tanto la vista como el

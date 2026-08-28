@@ -1,37 +1,85 @@
 import { viaje } from '../calc/gasolina.js';
 import { money, decimal, integer } from '../utils/format.js';
 
-/** Contenido de la página satélite. Comparte módulo de cálculo con la calculadora. */
+/**
+ * Ruta Madrid–Valencia.
+ *
+ * Se escribió para responder «cuánto cuesta», pero Search Console demostró que
+ * Google la sube sobre todo por **consultas de distancia**: trece de las catorce
+ * que la traen preguntan los kilómetros o el tiempo, no el precio
+ * (*distancia madrid valencia*, *km de madrid a valencia*, *madrid valencia
+ * coche tiempo*…). El dato estaba, pero enterrado en una fila de la tabla.
+ * Por eso ahora la respuesta corta lleva delante los kilómetros y el tiempo, y
+ * el coste va inmediatamente después: la página responde las dos preguntas.
+ *
+ * Distancia y duración contrastadas con el mapa de carreteras del RACE. La cifra
+ * anterior —355 km y «tres horas y media»— se quedaba veinte minutos corta.
+ */
+
+/** Kilómetros por la A-3 entre ambas capitales. Varía con el punto de partida. */
+const KM = 360;
+
+/** Duración al volante sin paradas, en minutos. */
+const MINUTOS = 225;
+
+const CONSUMO = 6; // l/100 km en autovía
+const PRECIO = 1.559; // €/l
+
+const tiempoTexto = (min) => `${Math.floor(min / 60)} h ${min % 60} min`;
+
 export default {
   cta: 'Calcular tu propia ruta en la calculadora',
   entradilla:
-    'Los 355 kilómetros de la A-3 son una de las rutas más transitadas de España. Esto es lo que cuesta en combustible con un coche medio.',
+    'Los 360 kilómetros de la A-3 son una de las rutas más transitadas de España, y se hacen en algo menos de cuatro horas. Esto es lo que tardas y lo que cuesta.',
   supuesto:
-    '355 km por la A-3, consumo medio de 6 l/100 km en autovía y gasolina a 1,559 €/l. La A-3 no tiene peajes.',
+    '360 km por la A-3, consumo medio de 6 l/100 km en autovía y gasolina a 1,559 €/l. La A-3 no tiene peajes. El tiempo es de conducción, sin contar paradas.',
 
   responde() {
-    const solo = viaje({ km: 355, consumo: 6, precio: 1.559, ocupantes: 1 });
-    const cuatro = viaje({ km: 355, consumo: 6, precio: 1.559, ocupantes: 4 });
-    const idaVuelta = viaje({ km: 355, consumo: 6, precio: 1.559, ocupantes: 4, idaVuelta: true });
+    const solo = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 1 });
+    const cuatro = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 4 });
+    const idaVuelta = viaje({ km: KM, consumo: CONSUMO, precio: PRECIO, ocupantes: 4, idaVuelta: true });
     return {
-      titular: money(solo.total),
-      unidad: 'de combustible solo la ida',
-      frase: `El trayecto consume unos <strong>${decimal(
-        solo.litros,
-        1
-      )} litros</strong> y cuesta <strong>${money(solo.total)}</strong> en combustible. Yendo cuatro personas
-      salen <strong>${money(cuatro.porPersona)} por cabeza</strong>, y el fin de semana completo —ida y
-      vuelta— sube a ${money(idaVuelta.porPersona)} cada uno.`,
+      titular: `${integer(KM)} km`,
+      unidad: `y unas ${tiempoTexto(MINUTOS)} al volante`,
+      frase: `El trayecto por la <strong>A-3</strong> son <strong>${integer(
+        KM
+      )} kilómetros</strong> que se recorren en <strong>${tiempoTexto(
+        MINUTOS
+      )}</strong> sin paradas, y no tiene ni un peaje. En combustible se van
+      <strong>${decimal(solo.litros, 1)} litros</strong>, unos <strong>${money(
+        solo.total
+      )}</strong>. Yendo cuatro personas salen <strong>${money(
+        cuatro.porPersona
+      )} por cabeza</strong>, y el fin de semana completo —ida y vuelta— sube a ${money(
+        idaVuelta.porPersona
+      )} cada uno.`,
       datos: [
         ['Distancia', `${integer(solo.km)} km`],
-        ['Combustible', `${decimal(solo.litros, 1)} litros`],
-        ['Coste por kilómetro', `${decimal(solo.porKm, 3)} €`],
+        ['Tiempo al volante', tiempoTexto(MINUTOS)],
+        ['Gasolina solo la ida', money(solo.total)],
         ['Ida y vuelta entre 4', `${money(idaVuelta.porPersona)} por persona`],
       ],
     };
   },
 
   contenido: `
+    <h2>La ruta: cuántos kilómetros y cuánto se tarda</h2>
+    <p>
+      Madrid y Valencia están separadas por unos <strong>360 kilómetros</strong> por la <strong>A-3</strong>,
+      la autovía del Este, que une las dos ciudades prácticamente en línea recta. El trayecto se hace en
+      <strong>unas 3 horas y 45 minutos</strong> de conducción efectiva, sin contar paradas.
+    </p>
+    <p>
+      Esa cifra baila según de dónde salgas y a dónde vayas: no es lo mismo arrancar desde el centro de Madrid
+      que desde la A-3 ya tomada, y en Valencia hay varios kilómetros de diferencia entre el centro y los
+      pueblos de la costa. Cuenta también que los accesos a Madrid —M-30, M-40 y M-50— son donde se acumula
+      casi todo el retraso los viernes por la tarde y los domingos por la noche. En hora punta de operación
+      salida, el trayecto se puede ir con facilidad por encima de las cuatro horas y media.
+    </p>
+    <p>
+      La buena noticia es que la <strong>A-3 no tiene peajes</strong> en ningún tramo, así que el único gasto
+      del camino es el combustible y lo que te tomes en el área de servicio.
+    </p>
     <h2>Qué hace variar el precio</h2>
     <p>
       La cifra de arriba usa un consumo de 6 litros cada 100 kilómetros, razonable para un turismo de gasolina
@@ -53,9 +101,8 @@ export default {
     </p>
     <h2>Lo que este cálculo no incluye</h2>
     <p>
-      Solo cuenta el combustible. La <strong>A-3 no tiene peajes</strong>, así que en esta ruta concreta no
-      hay nada que sumar por ese concepto, pero sí conviene contar el aparcamiento en destino, que en Valencia
-      capital no es barato.
+      Solo cuenta el combustible. Como la A-3 no tiene peajes, en esta ruta concreta no hay nada que sumar por
+      ese concepto, pero sí conviene contar el aparcamiento en destino, que en Valencia capital no es barato.
     </p>
     <p>
       Tampoco incluye el <strong>coste real de usar el coche</strong>: neumáticos, aceite, mantenimiento,
@@ -65,9 +112,9 @@ export default {
     <h2>Cuándo sale mejor el coche y cuándo el tren</h2>
     <p>
       Con estas cifras la comparación se hace sola. Yendo solo, el combustible ya se acerca al precio de un
-      billete de tren comprado con antelación, y encima pones tres horas y media de conducción frente a menos
-      de dos de trayecto. A partir de dos ocupantes el coche empieza a ganar, y con tres o cuatro no hay
-      discusión: el coste por persona baja a menos de la mitad de cualquier alternativa.
+      billete de tren comprado con antelación, y encima pones casi cuatro horas de conducción frente a menos
+      de dos de trayecto en AVE. A partir de dos ocupantes el coche empieza a ganar, y con tres o cuatro no
+      hay discusión: el coste por persona baja a menos de la mitad de cualquier alternativa.
     </p>
     <p>
       Hay un matiz que suele olvidarse: el coche te deja en el destino exacto, mientras que el tren te deja en

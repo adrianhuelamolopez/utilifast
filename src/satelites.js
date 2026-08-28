@@ -47,10 +47,12 @@ export const SATELITES = [
   {
     path: '/gasolina/madrid-valencia',
     herramienta: '/gasolina',
-    title: 'Cuánto cuesta ir de Madrid a Valencia en coche',
+    // Trece de las catorce consultas que traen a esta página preguntan la
+    // distancia o el tiempo, no el precio. El título los lleva delante.
+    title: 'Madrid a Valencia en coche: km, tiempo y coste',
     description:
-      'El coste real de combustible del trayecto Madrid–Valencia por la A-3, con el desglose por persona si viajáis varios y la cuenta del fin de semana completo.',
-    h1: '¿Cuánto cuesta ir de Madrid a Valencia en coche?',
+      'Los 360 km de la A-3 se hacen en unas 3 h 45 min y sin un solo peaje. Cuánta gasolina gasta el viaje, cuánto sale por persona y qué cuesta ir y volver.',
+    h1: 'De Madrid a Valencia en coche: distancia, tiempo y coste',
     load: () => import('./satelites/gasolina-madrid-valencia.js'),
   },
 ];
