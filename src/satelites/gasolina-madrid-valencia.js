@@ -15,12 +15,14 @@ import { respuestaDeRuta } from './_ruta.js';
  */
 
 const KM = 360;
-const MINUTOS = 225; // 3 h 45 min
+// Rango, no cifra única: con la A-3 despejada se hace en 3 h 15 min; saliendo
+// de Madrid en hora punta o en operación salida se va por encima de 4 h.
+const MINUTOS = [195, 255]; // 3 h 15 min – 4 h 15 min
 
 export default {
   cta: 'Calcular tu propia ruta en la calculadora',
   entradilla:
-    'Los 360 kilómetros de la A-3 son una de las rutas más transitadas de España, y se hacen en algo menos de cuatro horas. Esto es lo que tardas y lo que cuesta.',
+    'Los 360 kilómetros de la A-3 son una de las rutas más transitadas de España, y se hacen en entre tres horas y cuarto y cuatro y cuarto según el tráfico. Esto es lo que tardas y lo que cuesta.',
   supuesto:
     '360 km por la A-3, consumo medio de 6 l/100 km en autovía y gasolina a 1,559 €/l. La A-3 no tiene peajes. El tiempo es de conducción, sin contar paradas.',
 
@@ -37,10 +39,11 @@ export default {
     <p>
       Madrid y Valencia están separadas por unos <strong>360 kilómetros</strong> por la <strong>A-3</strong>,
       la autovía del Este, que une las dos ciudades prácticamente en línea recta. El trayecto se hace en
-      <strong>unas 3 horas y 45 minutos</strong> de conducción efectiva, sin contar paradas.
+      <strong>entre 3 horas y cuarto y 4 horas y cuarto</strong> de conducción efectiva, sin contar paradas.
     </p>
     <p>
-      Esa cifra baila según de dónde salgas y a dónde vayas: no es lo mismo arrancar desde el centro de Madrid
+      Ese margen no es prudencia excesiva: es la diferencia real entre hacerlo un martes a media mañana con
+      la autovía despejada y hacerlo un viernes por la tarde. Baila además según de dónde salgas y a dónde vayas: no es lo mismo arrancar desde el centro de Madrid
       que desde la A-3 ya tomada, y en Valencia hay varios kilómetros de diferencia entre el centro y los
       pueblos de la costa. Cuenta también que los accesos a Madrid —M-30, M-40 y M-50— son donde se acumula
       casi todo el retraso los viernes por la tarde y los domingos por la noche. En hora punta de operación
@@ -82,7 +85,7 @@ export default {
     <h2>Cuándo sale mejor el coche y cuándo el tren</h2>
     <p>
       Con estas cifras la comparación se hace sola. Yendo solo, el combustible ya se acerca al precio de un
-      billete de tren comprado con antelación, y encima pones casi cuatro horas de conducción frente a menos
+      billete de tren comprado con antelación, y encima pones tres o cuatro horas de conducción frente a menos
       de dos de trayecto en AVE. A partir de dos ocupantes el coche empieza a ganar, y con tres o cuatro no
       hay discusión: el coste por persona baja a menos de la mitad de cualquier alternativa.
     </p>

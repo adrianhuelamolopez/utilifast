@@ -11,12 +11,14 @@ import { respuestaDeRuta } from './_ruta.js';
  */
 
 const KM = 620;
-const MINUTOS = 375; // 6 h 15 min
+// Rango, no cifra única: 5 h 30 min con la A-2 despejada, 7 h con tráfico en
+// los accesos a Madrid y Barcelona o en operación salida.
+const MINUTOS = [330, 420]; // 5 h 30 min – 7 h
 
 export default {
   cta: 'Calcular tu propia ruta en la calculadora',
   entradilla:
-    'Es el trayecto largo por excelencia entre las dos ciudades más grandes de España: más de seis horas al volante. Esto es lo que tardas, lo que gastas y cuándo compensa frente al AVE.',
+    'Es el trayecto largo por excelencia entre las dos ciudades más grandes de España: entre cinco horas y media y siete al volante. Esto es lo que tardas, lo que gastas y cuándo compensa frente al AVE.',
   supuesto:
     '620 km por la A-2, consumo medio de 6 l/100 km en autovía y gasolina a 1,559 €/l. El tiempo es de conducción efectiva, sin contar paradas.',
 
@@ -32,10 +34,10 @@ export default {
     <h2>La ruta: cuántos kilómetros y cuánto se tarda</h2>
     <p>
       Madrid y Barcelona están separadas por unos <strong>620 kilómetros</strong> por la <strong>A-2</strong>,
-      que atraviesa Guadalajara, Zaragoza y Lleida. El tiempo de conducción efectiva ronda las
-      <strong>6 horas y 15 minutos</strong>, y ahí está la clave de todo lo demás: no es un trayecto que se
+      que atraviesa Guadalajara, Zaragoza y Lleida. El tiempo de conducción efectiva va de las
+      <strong>5 horas y media a las 7 horas</strong> según el tráfico, y ahí está la clave de todo lo demás: no es un trayecto que se
       haga del tirón. Contando la parada obligada para repostar, comer y estirar las piernas, la planificación
-      realista es de <strong>siete horas de puerta a puerta</strong>.
+      realista pasa de las <strong>siete horas de puerta a puerta</strong>.
     </p>
     <p>
       A esa distancia la fatiga deja de ser un detalle y pasa a ser parte del cálculo. La recomendación
@@ -71,7 +73,7 @@ export default {
     <h2>Aquí el AVE es un rival serio</h2>
     <p>
       En rutas cortas el coche gana casi siempre. En esta no. El <strong>AVE cubre el Madrid–Barcelona en
-      unas dos horas y media</strong>, frente a las más de seis del coche: son casi cuatro horas de diferencia
+      unas dos horas y media</strong>, frente a las seis o siete del coche: son casi cuatro horas de diferencia
       por trayecto, ocho en un viaje de ida y vuelta. Eso es un día entero de tu fin de semana.
     </p>
     <p>

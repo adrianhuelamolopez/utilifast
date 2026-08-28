@@ -51,7 +51,7 @@ export const SATELITES = [
     // distancia o el tiempo, no el precio. El título los lleva delante.
     title: 'Madrid a Valencia en coche: km, tiempo y coste',
     description:
-      'Los 360 km de la A-3 se hacen en unas 3 h 45 min y sin un solo peaje. Cuánta gasolina gasta el viaje, cuánto sale por persona y qué cuesta ir y volver.',
+      'Los 360 km de la A-3 se hacen en entre 3 h 15 min y 4 h 15 min, y sin un solo peaje. Cuánta gasolina gasta el viaje y cuánto sale por persona.',
     h1: 'De Madrid a Valencia en coche: distancia, tiempo y coste',
     load: () => import('./satelites/gasolina-madrid-valencia.js'),
   },
@@ -60,7 +60,7 @@ export const SATELITES = [
     herramienta: '/gasolina',
     title: 'Madrid a Barcelona en coche: km, tiempo y coste',
     description:
-      'Son 620 km por la A-2 y unas 6 h 15 min al volante. Desde 2021 no tiene peajes. Cuánta gasolina gasta, cuánto sale por persona y cuándo gana el AVE.',
+      'Son 620 km por la A-2 y entre 5 h 30 min y 7 h al volante. Desde 2021 no tiene peajes. Cuánta gasolina gasta y cuándo compensa más el AVE.',
     h1: 'De Madrid a Barcelona en coche: distancia, tiempo y coste',
     load: () => import('./satelites/gasolina-madrid-barcelona.js'),
   },
@@ -69,7 +69,7 @@ export const SATELITES = [
     herramienta: '/gasolina',
     title: 'Madrid a Sevilla en coche: km, tiempo y coste',
     description:
-      'Los 530 km de la A-4 se hacen en unas 5 h 30 min y sin peajes. Cuánta gasolina gasta, por qué Despeñaperros sube el consumo y cuánto sale por persona.',
+      'Los 530 km de la A-4 se hacen en entre 4 h 45 min y 6 h 15 min, sin peajes. Por qué Despeñaperros sube el consumo y cuánto sale por persona.',
     h1: 'De Madrid a Sevilla en coche: distancia, tiempo y coste',
     load: () => import('./satelites/gasolina-madrid-sevilla.js'),
   },

@@ -174,10 +174,21 @@ propio**, nunca una copia del cálculo. Lo que sí debe ser distinto en cada una
 Madrid–Barcelona lleva la AP-2 sin peaje desde 2021 y la comparación con el AVE; Madrid–Sevilla,
 Despeñaperros y el calor del verano. Tres plantillas rellenadas serían contenido de escaso valor.
 
-Distancias y tiempos contrastados con el mapa de carreteras del RACE: Madrid–Valencia 360 km /
-3 h 45 min · Madrid–Barcelona 620 km / 6 h 15 min · Madrid–Sevilla 530 km / 5 h 30 min.
-Son tiempos conservadores, con tráfico realista en los accesos; a velocidad de crucero y con la
-carretera despejada se hacen en bastante menos.
+**El tiempo se publica como rango, nunca como cifra única.** `minutos` es `[mínimo, máximo]`. Un
+número único miente siempre en una de las dos direcciones: la cifra del RACE incluye tráfico en los
+accesos, y quien conoce la ruta y sale con la carretera despejada la hace en bastante menos —lo
+señaló el propio propietario, que hace el Madrid–Valencia en tres horas—. Prometer el tiempo
+optimista es el peor de los dos errores: quien salga confiado un domingo de agosto pensará que le
+hemos mentido. Distancias del RACE y rangos publicados:
+
+| Ruta | Distancia | Tiempo |
+| --- | --- | --- |
+| Madrid–Valencia (A-3) | 360 km | 3 h 15 min – 4 h 15 min |
+| Madrid–Barcelona (A-2) | 620 km | 5 h 30 min – 7 h |
+| Madrid–Sevilla (A-4) | 530 km | 4 h 45 min – 6 h 15 min |
+
+En prosa el rango va con «y» (`rangoTexto`) y en la ficha de dato con guion: «3 h 15 min y 4 h 15
+min» suelto en un `stat` se lee como dos cosas en vez de como una franja.
 
 **Doc y auditoría tienen que decir lo mismo.** El `CLAUDE.md` fijaba la descripción en 158
 caracteres y `auditar.mjs` solo avisaba a partir de 165: tres descripciones se publicaron pasadas de
