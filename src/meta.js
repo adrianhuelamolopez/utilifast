@@ -235,8 +235,8 @@ export const macros = {
   "isTool": true,
   "cluster": "salud",
   "icon": "nutrition",
-  "title": "Calculadora de macros por comida",
-  "description": "Calcula tus calorías diarias y reparte proteínas, carbohidratos y grasas entre 3, 4 o 5 comidas, con los gramos exactos de cada toma en una tabla editable.",
+  "title": "Calculadora de macros: proteína, hidratos y grasa",
+  "description": "Reparte tus calorías diarias entre proteína, hidratos y grasa, y calcula los gramos exactos de cada macronutriente en cada comida del día.",
   "card": {
     "title": "Macros por comida",
     "blurb": "Reparte proteína, carbohidratos y grasas entre tus tomas diarias.",
