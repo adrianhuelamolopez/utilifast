@@ -27,6 +27,17 @@ export const SATELITES = [
     load: () => import('./satelites/neumaticos-225-45-r17.js'),
   },
   {
+    path: '/neumaticos/tabla-equivalencias',
+    herramienta: '/neumaticos',
+    // Siete consultas distintas piden literalmente una «tabla», y la de la
+    // herramienta solo existe tras rellenar el formulario y con JavaScript.
+    title: 'Tabla de equivalencias de neumáticos',
+    description:
+      'Las equivalencias ya calculadas para los seis neumáticos más habituales en España, con el ±3 % del Manual ITV y los otros tres criterios que también cuentan.',
+    h1: 'Tabla de equivalencias de neumáticos para la ITV',
+    load: () => import('./satelites/neumaticos-tabla-equivalencias.js'),
+  },
+  {
     path: '/hipoteca/amortizar-o-invertir',
     herramienta: '/hipoteca',
     title: '¿Amortizar hipoteca o invertir? La cuenta con números',

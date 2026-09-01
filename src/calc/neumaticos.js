@@ -66,3 +66,44 @@ export function criterios(actual, nueva) {
 export function velocidadReal(actual, nueva, marcada = 120) {
   return marcada * (diametro(nueva) / diametro(actual));
 }
+
+/* ------------------------------------------------------------------ *
+ * Medidas comerciales y búsqueda de equivalentes
+ * ------------------------------------------------------------------ *
+ * Vivía dentro del `mount()` de la vista, así que solo existía después de que
+ * el usuario rellenara el formulario y solo en el navegador. Las consultas de
+ * Search Console piden literalmente «tabla de equivalencia de neumáticos»
+ * —siete variantes distintas— y Google nunca llegaba a ver ninguna tabla.
+ * Al vivir aquí, la página satélite puede escribirla ya calculada en el HTML.
+ */
+
+export const ANCHOS = [135, 145, 155, 165, 175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285, 295];
+export const PERFILES = [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80];
+export const LLANTAS = [13, 14, 15, 16, 17, 18, 19, 20, 21];
+
+/**
+ * Filtrar solo por diámetro no basta: un 155/40 R20 tiene el mismo diámetro que
+ * un 205/55 R16 y no es una sustitución que nadie plantee. Se acotan también la
+ * anchura y el salto de llanta a lo que se monta en la práctica.
+ */
+export const MAX_SALTO_ANCHO = 30; // mm arriba o abajo
+export const MAX_SALTO_LLANTA = 2; // pulgadas arriba o abajo
+
+/** Medidas comerciales dentro de la tolerancia, de la más parecida a la que menos. */
+export function equivalentes(base) {
+  const dBase = diametro(base);
+  const out = [];
+  for (const llanta of LLANTAS) {
+    if (Math.abs(llanta - base.llanta) > MAX_SALTO_LLANTA) continue;
+    for (const ancho of ANCHOS) {
+      if (Math.abs(ancho - base.ancho) > MAX_SALTO_ANCHO) continue;
+      for (const perfil of PERFILES) {
+        const m = { ancho, perfil, llanta };
+        if (m.ancho === base.ancho && m.perfil === base.perfil && m.llanta === base.llanta) continue;
+        const dif = ((diametro(m) - dBase) / dBase) * 100;
+        if (Math.abs(dif) <= TOLERANCIA) out.push({ ...m, dif, d: diametro(m) });
+      }
+    }
+  }
+  return out.sort((a, b) => Math.abs(a.dif) - Math.abs(b.dif));
+}

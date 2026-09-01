@@ -6,7 +6,8 @@ import { decimal, integer, readNumber, clamp } from '../utils/format.js';
 import { qs, listeners } from '../utils/dom.js';
 import { bindCopyButton } from '../utils/clipboard.js';
 import {
-  CARGA, VELOCIDAD, TOLERANCIA, diametro, circunferencia,
+  CARGA, VELOCIDAD, TOLERANCIA, ANCHOS, PERFILES, LLANTAS,
+  diametro, circunferencia, equivalentes,
   medida as texto, medidaCompleta as completa,
 } from '../calc/neumaticos.js';
 
@@ -14,11 +15,6 @@ import {
 // sin arrastrar el código de esta vista, que se carga bajo demanda.
 import { neumaticos as meta } from '../meta.js';
 export { meta };
-
-// Medidas comerciales habituales en turismo.
-const ANCHOS = [135, 145, 155, 165, 175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285, 295];
-const PERFILES = [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80];
-const LLANTAS = [13, 14, 15, 16, 17, 18, 19, 20, 21];
 
 const INDICES_CARGA = Object.keys(CARGA).map(Number);
 
@@ -307,27 +303,6 @@ export function mount(root) {
    * un 205/55 R16 y no es una sustitución que nadie plantee. Se acotan también la
    * anchura y el salto de llanta a lo que se monta en la práctica.
    */
-  const MAX_SALTO_ANCHO = 30; // mm arriba o abajo
-  const MAX_SALTO_LLANTA = 2; // pulgadas arriba o abajo
-
-  function equivalentes(base) {
-    const dBase = diametro(base);
-    const out = [];
-    for (const llanta of LLANTAS) {
-      if (Math.abs(llanta - base.llanta) > MAX_SALTO_LLANTA) continue;
-      for (const ancho of ANCHOS) {
-        if (Math.abs(ancho - base.ancho) > MAX_SALTO_ANCHO) continue;
-        for (const perfil of PERFILES) {
-          const m = { ancho, perfil, llanta };
-          if (m.ancho === base.ancho && m.perfil === base.perfil && m.llanta === base.llanta) continue;
-          const dif = ((diametro(m) - dBase) / dBase) * 100;
-          if (Math.abs(dif) <= TOLERANCIA) out.push({ ...m, dif, d: diametro(m) });
-        }
-      }
-    }
-    return out.sort((a, b) => Math.abs(a.dif) - Math.abs(b.dif));
-  }
-
   function pintarFiltros(lista, base) {
     const llantas = [...new Set(lista.map((m) => m.llanta))].sort((a, b) => a - b);
     el('filtro-llanta').innerHTML =

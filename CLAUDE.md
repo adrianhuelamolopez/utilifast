@@ -17,7 +17,7 @@ npm run auditar  # revisa dist: metadatos, huérfanas, JSON-LD, nombres bloqueab
 
 ## Estado actual
 
-- **14 herramientas** + 7 páginas satélite + `/quienes-somos` + `/legal` = **24 rutas prerenderizadas**.
+- **14 herramientas** + 8 páginas satélite + `/quienes-somos` + `/legal` = **25 rutas prerenderizadas**.
 - Núcleo JS **47,6 kB (16,1 kB gzip)**; CSS 9,7 kB gzip; 30 chunks (uno por vista).
 - Artículos de 333–496 palabras por herramienta. Los satélites van de **318 a 432** (medido, no
   estimado: la nota anterior decía ~270 y era falsa), más el bloque de respuesta con las cifras.
@@ -194,6 +194,16 @@ min» suelto en un `stat` se lee como dos cosas en vez de como una franja.
 caracteres y `auditar.mjs` solo avisaba a partir de 165: tres descripciones se publicaron pasadas de
 largo sin que saltara nada. Ahora el umbral del script es 158. **Si cambias un límite documentado,
 cámbialo también en el script, o el script deja de defenderlo.**
+
+**Si la herramienta lo genera con JavaScript, Google no lo ve.** `/neumaticos` llevaba desde el
+principio una tabla de equivalencias perfectamente válida… que solo existía **después** de que el
+usuario rellenara el formulario, y solo en el navegador. Mientras tanto, siete consultas distintas
+pedían literalmente *tabla de equivalencia de neumáticos* y en el HTML de este sitio no había ni una.
+De ahí sale `/neumaticos/tabla-equivalencias`, que la escribe ya calculada en el prerender.
+
+`equivalentes()` y las listas de medidas comerciales vivían dentro del `mount()` de la vista y se
+movieron a `calc/neumaticos.js` para que la satélite pudiera usarlas en Node. **Regla: si un cálculo
+puede alimentar una página estática, va en `src/calc/`, no dentro de un `mount()`.**
 
 **Cifras del artículo que contradicen a la herramienta.** Pasó una vez: el texto de hipoteca decía
 «unos 15.000 €» y la calculadora daba 12.744 €. Por eso las matemáticas no triviales viven en
